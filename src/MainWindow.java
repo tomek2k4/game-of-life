@@ -34,6 +34,9 @@ public class MainWindow extends JFrame {
 	private Dimension wymiaryGlownegoOkna;
 	private Dimension wymiaryPrzycisku;
 
+	private int panelStatusuMinHeigh = 100;
+	private int gap = 50;
+	
 	private Container panelSterowania = new JPanel();
 	private Container panelStatusu = new JPanel();
 	private Mikroswiat mikroswiat;
@@ -44,16 +47,17 @@ public class MainWindow extends JFrame {
     private JLabel statusLabel = new JLabel("Tu bedzie cos napisane.");
     
     
+    
     public MainWindow(WielkoscPlanszyEnum plansza){
     	super("Gra w Zycie");
     	
     	wymiaryPrzycisku =  new JButton("default button").getPreferredSize();
     	
-    	wymiaryGlownegoOkna = new Dimension(plansza.getWymiar().width + wymiaryPrzycisku.width, 
-    			wymiaryPrzycisku.height);
+    	wymiaryGlownegoOkna = new Dimension(plansza.getWymiar().width + wymiaryPrzycisku.width + gap, 
+    			plansza.getWymiar().height +  panelStatusuMinHeigh);
     			
         this.setSize(wymiaryGlownegoOkna);
-        this.setResizable(false);
+        this.setMinimumSize(wymiaryGlownegoOkna);
    	
     	//Create Mikroswiat Panel
     	this.mikroswiat = new Mikroswiat(plansza);
@@ -75,27 +79,27 @@ public class MainWindow extends JFrame {
     
  
     public void addMikroswiatPanel(Container pane,JPanel mikroswiat){
-	    GridBagConstraints c = new GridBagConstraints();
+    	Border border = BorderFactory.createLineBorder(Color.BLACK);
+    	
+    	((JComponent) mikroswiat).setBorder(border);
+    	
+    	GridBagConstraints c = new GridBagConstraints();
 	    c.fill = GridBagConstraints.HORIZONTAL;
 	    c.gridx = 0;
 	    c.gridy = 0;
 	    pane.add(mikroswiat, c);
+    
+    
     }
     
     public void addOtherComponentsToPane(Container pane) {
     	
-    	BoxLayout panelSterowaniaLayout = new BoxLayout(panelSterowania, BoxLayout.Y_AXIS);
-        
+
+    	GridLayout panelSterowaniaLayout = new GridLayout(3,1, 5, 5);  	
     	Border empty = BorderFactory.createEmptyBorder(5, 5, 5, 5);
     	panelSterowania.setLayout(panelSterowaniaLayout);
-    	panelSterowania.add(Box.createRigidArea(new Dimension(0,5)));
-    	startButton.setPreferredSize(wymiaryPrzycisku);
     	panelSterowania.add(startButton);
-    	panelSterowania.add(Box.createRigidArea(new Dimension(0,5)));
-    	pauzaButton.setPreferredSize(wymiaryPrzycisku);
     	panelSterowania.add(pauzaButton);
-    	panelSterowania.add(Box.createRigidArea(new Dimension(0,5)));
-    	krokButton.setPreferredSize(wymiaryPrzycisku);
     	panelSterowania.add(krokButton);
         ((JComponent) panelSterowania).setBorder(empty);
     	

@@ -10,11 +10,15 @@ import javax.swing.JPanel;
 
 public class Mikroswiat extends JPanel{
 
+	private Dimension wymiar;	
+	
 	public Mikroswiat(WielkoscPlanszyEnum wielkosc) {
 		
-		Dimension wymiar = wielkosc.getWymiar();
+		wymiar = wielkosc.getWymiar();
 		this.setBackground(Color.WHITE);
 		this.setPreferredSize(wymiar);
+		
+		
 		
 		this.addMouseListener(new MikroswiatMouseListener());
 	}
@@ -26,6 +30,18 @@ public class Mikroswiat extends JPanel{
 	}
 
 
+	private void drawGrid(){
+		
+		int width = wymiar.width;
+		int height = wymiar.height;
+		
+		int size = Komorka.CELL_SIZE;
+		
+		
+		
+	}
+	
+	
     private class MikroswiatMouseListener extends MouseAdapter {
 
         private int startX;
