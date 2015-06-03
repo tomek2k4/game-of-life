@@ -1,9 +1,14 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.ComponentOrientation;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -15,7 +20,10 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 
 
@@ -23,83 +31,109 @@ import javax.swing.border.Border;
 
 public class MainWindow extends JFrame {
 	
-	private static final Dimension MALE_OKNO = new Dimension(300, 200);
-	private static final Dimension SREDNIE_OKNO = new Dimension(600, 400);
-	private static final Dimension DUZE_OKNO = new Dimension(800, 600);
+	private Dimension wymiaryGlownegoOkna;
+	private Dimension wymiaryPrzycisku;
 
-    private Container panel_mikroswiat = new JPanel();
-    private Container panel_status = new JPanel();
-    private Container panel_sterowania = new JPanel();
-    private JButton start = new JButton("Start");
-    private JButton pauza = new JButton("Pauza");
-    private JButton krok = new JButton("Do przodu");
-    private JLabel status = new JLabel("Tu bedzie cos napisane.");
-    private Border empty;
+	private Container panelSterowania = new JPanel();
+	private Container panelStatusu = new JPanel();
+	private Mikroswiat mikroswiat;
 	
-	public MainWindow(){
-        super("Okno Glowne");
-        setSize(DUZE_OKNO);
-        
-        setLocationRelativeTo(null);
-        setResizable(false);
+    private JButton startButton = new JButton("Start");
+    private JButton pauzaButton = new JButton("Pauza");
+    private JButton krokButton = new JButton("Do przodu");
+    private JLabel statusLabel = new JLabel("Tu bedzie cos napisane.");
+    
+    
+    public MainWindow(WielkoscPlanszyEnum plansza){
+    	super("Gra w Zycie");
+    	
+    	wymiaryPrzycisku =  new JButton("default button").getPreferredSize();
+    	
+    	wymiaryGlownegoOkna = new Dimension(plansza.getWymiar().width + wymiaryPrzycisku.width, 
+    			wymiaryPrzycisku.height);
+    			
+        this.setSize(wymiaryGlownegoOkna);
+        this.setResizable(false);
+   	
+    	//Create Mikroswiat Panel
+    	this.mikroswiat = new Mikroswiat(plansza);
 
-        Container ekran = getContentPane();
-        ekran.setLayout( new BorderLayout() );
+    	//Create and set up the window.
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            
+        this.getContentPane().setLayout(new GridBagLayout());
+        //Set up the content pane.
+        this.addMikroswiatPanel(this.getContentPane(),mikroswiat);
         
+        this.addOtherComponentsToPane(this.getContentPane());
+ 
+        //Display the window.
+        this.pack();
+        this.setVisible(true);
+    	
+    }
+    
+ 
+    public void addMikroswiatPanel(Container pane,JPanel mikroswiat){
+	    GridBagConstraints c = new GridBagConstraints();
+	    c.fill = GridBagConstraints.HORIZONTAL;
+	    c.gridx = 0;
+	    c.gridy = 0;
+	    pane.add(mikroswiat, c);
+    }
+    
+    public void addOtherComponentsToPane(Container pane) {
+    	
+    	BoxLayout panelSterowaniaLayout = new BoxLayout(panelSterowania, BoxLayout.Y_AXIS);
         
-        panel_mikroswiat.setSize(new Dimension(300,200));
-        ekran.add(panel_mikroswiat, BorderLayout.CENTER);
-        ekran.add(panel_sterowania, BorderLayout.EAST);
-        ekran.add(panel_status, BorderLayout.SOUTH);
-        
-        panel_status.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        panel_status.add(status);
-        
-        
-        BoxLayout panel_sterowania_layout = new BoxLayout(panel_sterowania, BoxLayout.Y_AXIS);
-        
-        
-        empty = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-        panel_sterowania.setLayout(panel_sterowania_layout);
-        panel_sterowania.add(Box.createRigidArea(new Dimension(0,5)));
-        panel_sterowania.add(start);
-        panel_sterowania.add(Box.createRigidArea(new Dimension(0,5)));
-        panel_sterowania.add(pauza);
-        panel_sterowania.add(Box.createRigidArea(new Dimension(0,5)));
-        panel_sterowania.add(krok);
-        ((JComponent) panel_sterowania).setBorder(empty);
-        
-        
-        panel_mikroswiat.addMouseListener(new MyMouseListener());
-		
-	}
-	
-    private class MyMouseListener extends MouseAdapter {
+    	Border empty = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+    	panelSterowania.setLayout(panelSterowaniaLayout);
+    	panelSterowania.add(Box.createRigidArea(new Dimension(0,5)));
+    	startButton.setPreferredSize(wymiaryPrzycisku);
+    	panelSterowania.add(startButton);
+    	panelSterowania.add(Box.createRigidArea(new Dimension(0,5)));
+    	pauzaButton.setPreferredSize(wymiaryPrzycisku);
+    	panelSterowania.add(pauzaButton);
+    	panelSterowania.add(Box.createRigidArea(new Dimension(0,5)));
+    	krokButton.setPreferredSize(wymiaryPrzycisku);
+    	panelSterowania.add(krokButton);
+        ((JComponent) panelSterowania).setBorder(empty);
+    	
 
-        private int startX;
-        private int startY;
+       	GridBagConstraints c = new GridBagConstraints();
+    	c.fill = GridBagConstraints.HORIZONTAL;
+    	c.weightx = 0.5;
+    	c.gridx = 1;
+    	c.gridy = 0;
+    	c.anchor = c.NORTH;
+    	pane.add(panelSterowania, c);
+    	
+    	
+    	
+        panelStatusu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+        panelStatusu.add(statusLabel);
+    	
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.ipady = 0;       //reset to default
+        c.weighty = 1.0;   //request any extra vertical space
+        c.anchor = GridBagConstraints.PAGE_END; //bottom of space
+        c.insets = new Insets(10,0,0,0);  //top padding
+        c.gridx = 0;       //aligned with button 2
+        c.gridwidth = 2;   //2 columns wide
+        c.gridy = 2;       //third row
+        pane.add(panelStatusu, c);
+    	
+    	
+    	
+    }
 
-        @Override
-        public void mousePressed(MouseEvent e) {
-            startX = e.getX();
-            startY = e.getY();
-        }
+    
+    public static void main(String[] args) {
+    	MainWindow okno = new MainWindow(WielkoscPlanszyEnum.DUZA);
 
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            Graphics g = panel_mikroswiat.getGraphics();
-            g.setColor(Color.BLUE);
-            g.drawLine(startX, startY, e.getX(), e.getY());
-        }
-        
     }
 	
 	
-	public static void main(String[] args) {
-		MainWindow okno = new MainWindow();
-        
-        okno.setVisible(true);
-	}
 	
-	
+
 }
