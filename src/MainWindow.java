@@ -67,7 +67,7 @@ public class MainWindow extends JFrame {
             
         this.getContentPane().setLayout(new GridBagLayout());
         //Set up the content pane.
-        this.addMikroswiatPanel(this.getContentPane(),mikroswiat);
+        this.addMikroswiatPanel(this.getContentPane(),mikroswiat.getMikroswiatPanel());
         
         this.addOtherComponentsToPane(this.getContentPane());
  
