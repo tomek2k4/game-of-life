@@ -1,7 +1,8 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.GridLayout;
+import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.List;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -9,78 +10,102 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.Observable;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
-public class Mikroswiat extends Observable{
+public class Mikroswiat extends JPanel{
 
-	private Dimension wymiar;	
-	private JPanel mikroswiatPanel=null;
-	
-	Komorka[][] tablicaKomorek; 
-	
-	MouseAdapter mouseHandler;
-	
-    private int columnCount = 5;
-    private int rowCount = 5;
+    private int columnCount;
+    private int rowCount;
     private List<Rectangle> cells;
     private Point selectedCell;
-	
+	private Dimension wymiarPlanszy;
 
-	public Mikroswiat(WielkoscPlanszyEnum wielkosc) {
-		
-		this.mikroswiatPanel = new JPanel();
-		
-		wymiar = wielkosc.getWymiar();
-		mikroswiatPanel.setBackground(Color.WHITE);
-		mikroswiatPanel.setPreferredSize(wymiar);
-		
-		this.drawGrid();
+    public Mikroswiat(WielkoscPlanszyEnum plansza) {
+ 
+    	wymiarPlanszy = plansza.getWymiar();
+    	rowCount = plansza.getWymiar().width / Komorka.CELL_SIZE;
+    	columnCount = plansza.getWymiar().height / Komorka.CELL_SIZE;
+    	
+    	cells = new ArrayList<>(columnCount * rowCount);
+  
+        MouseAdapter mouseHandler;
+        mouseHandler = new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                Point point = e.getPoint();
 
-		mouseHandler = new MikroswiatMouseAdapter();
-		mikroswiatPanel.addMouseListener(mouseHandler);
-		mikroswiatPanel.addMouseMotionListener(mouseHandler);
-		
+                int width = getWidth();
+                int height = getHeight();
 
-	}
+                int cellWidth = width / columnCount;
+                int cellHeight = height / rowCount;
 
-	private void drawGrid(){
-		
-		int width = wymiar.width;
-		int height = wymiar.height;
-		
-		int size = Komorka.CELL_SIZE;	
-		
-		rowCount = width / size;
-		columnCount = height / size;
-				
-	}
-	
-	
-    private class MikroswiatMouseAdapter extends MouseAdapter {
+                int column = e.getX() / cellWidth;
+                int row = e.getY() / cellHeight;
 
-        private int startX;
-        private int startY;
+                selectedCell = new Point(column, row);
+                repaint();
 
-        @Override
-        public void mousePressed(MouseEvent e) {
-            startX = e.getX();
-            startY = e.getY();
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-            Graphics g = mikroswiatPanel.getGraphics();
-            g.setColor(Color.BLUE);
-            g.drawLine(startX, startY, e.getX(), e.getY());
-        }
-	
+            }
+        };
+        addMouseMotionListener(mouseHandler);
     }
 
-    public JPanel getMikroswiatPanel() {
-    	return mikroswiatPanel;
+    @Override
+    public Dimension getPreferredSize() {
+        return wymiarPlanszy;
+    }
+
+    @Override
+    public void invalidate() {
+        cells.clear();
+        selectedCell = null;
+        super.invalidate();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2d = (Graphics2D) g.create();
+
+        int width = getWidth();
+        int height = getHeight();
+
+        int cellWidth = width / columnCount;
+        int cellHeight = height / rowCount;
+
+        int xOffset = (width - (columnCount * cellWidth)) / 2;
+        int yOffset = (height - (rowCount * cellHeight)) / 2;
+
+        if (cells.isEmpty()) {
+            for (int row = 0; row < rowCount; row++) {
+                for (int col = 0; col < columnCount; col++) {
+                    Rectangle cell = new Rectangle(
+                            xOffset + (col * cellWidth),
+                            yOffset + (row * cellHeight),
+                            cellWidth,
+                            cellHeight);
+                    cells.add(cell);
+                }
+            }
+        }
+
+        if (selectedCell != null) {
+
+            int index = selectedCell.x + (selectedCell.y * columnCount);
+            Rectangle cell = cells.get(index);
+            g2d.setColor(Color.BLUE);
+            g2d.fill(cell);
+
+        }
+
+        g2d.setColor(Color.GRAY);
+        for (Rectangle cell : cells) {
+            g2d.draw(cell);
+        }
+
+        g2d.dispose();
     }
 }
+	
