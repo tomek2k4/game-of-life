@@ -122,25 +122,25 @@ public class MainWindow extends JFrame {
     	pane.add(panelSterowania, c);
     	
     	
-    	empty = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-    	panelStatusu.setLayout(new GridLayout(1,1, 5, 5));
-    	konsola = new JTextArea(2, 30);
+    	empty = BorderFactory.createEmptyBorder(5, 0, 5, 10);
+    	panelStatusu.setLayout(new GridLayout(1,1, 0, 0));
+    	konsola = new JTextArea(5, 30);
     	konsola.setEditable(false);
 	    JScrollPane scrollPane = new JScrollPane(konsola);
 //			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, 
 //			JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         konsola.getDocument().addDocumentListener(new LimitLinesDocumentListener(MAKS_LINI_W_KONSOLI, false));
-        panelStatusu.add(konsola);
+        panelStatusu.add(scrollPane);
         ((JComponent) panelStatusu).setBorder(empty);
         
 //    	JButton button = new JButton("Long-Named Button 4");
-    	c.fill = GridBagConstraints.HORIZONTAL;
-    	c.ipady = 10;      //make this component tall
-    	c.weightx = 0.0;
-    	c.gridwidth = 3;
-    	c.gridx = 0;
-    	c.gridy = 1;
-    	pane.add(konsola, c);
+//    	c.fill = GridBagConstraints.HORIZONTAL;
+//    	c.ipady = 10;      //make this component tall
+//    	c.weightx = 0.0;
+//    	c.gridwidth = 3;
+//    	c.gridx = 0;
+//    	c.gridy = 1;
+//    	pane.add(panelStatusu, c);
     	
     	
 //        panelStatusu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
@@ -175,12 +175,13 @@ public class MainWindow extends JFrame {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.ipady = 0;       //reset to default
         c.weighty = 1.0;   //request any extra vertical space
-        c.anchor = GridBagConstraints.PAGE_END; //bottom of space
+        c.anchor = GridBagConstraints.PAGE_START; //bottom of space
         //c.insets = new Insets(10,0,0,0);  //top padding
-        c.gridx = 1;       //aligned with button 2
+        c.gridx = 0;       //aligned with button 2
         c.gridwidth = 2;   //2 columns wide
         c.gridy = 2;       //third row
-        pane.add(label, c);
+        c.fill = GridBagConstraints.BOTH;
+        pane.add(panelStatusu, c);
     	
     }
     
@@ -196,7 +197,7 @@ public class MainWindow extends JFrame {
     }
 
     public static void main(String[] args) {
-    	MainWindow okno = new MainWindow(WielkoscPlanszyEnum.MALA);
+    	MainWindow okno = new MainWindow(WielkoscPlanszyEnum.SREDNIA);
 
     }
 	
