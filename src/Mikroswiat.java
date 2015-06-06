@@ -49,7 +49,7 @@ public class Mikroswiat extends JPanel{
 
             }
         };
-        addMouseMotionListener(mouseHandler);
+        //addMouseMotionListener(mouseHandler);
     }
 
     @Override
