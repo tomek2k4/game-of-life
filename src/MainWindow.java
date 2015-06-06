@@ -25,6 +25,8 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
@@ -32,10 +34,9 @@ import javax.swing.border.TitledBorder;
 
 
 
-
-
 public class MainWindow extends JFrame {
 	
+	private static final int MAKS_LINI_W_KONSOLI = 1000;
 	private Dimension wymiaryGlownegoOkna;
 	private Dimension wymiaryPrzycisku;
 
@@ -44,12 +45,12 @@ public class MainWindow extends JFrame {
 	
 	private Container panelSterowania = new JPanel();
 	private Container panelStatusu = new JPanel();
+    private JTextArea konsola;
 	private Mikroswiat mikroswiat;
 	
     private JButton startButton = new JButton("Start");
     private JButton pauzaButton = new JButton("Pauza");
     private JButton krokButton = new JButton("Do przodu");
-    private JLabel statusLabel = new JLabel("Tu bedzie cos napisane.");
     
     
     
@@ -121,10 +122,28 @@ public class MainWindow extends JFrame {
     	c.anchor = c.NORTH;
     	pane.add(panelSterowania, c);
     	
-    	
-    	
         panelStatusu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        panelStatusu.add(statusLabel);
+        konsola = new JTextArea();
+        konsola.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(konsola);
+//        		JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
+//        		JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        konsola.getDocument().addDocumentListener(
+        		new LimitLinesDocumentListener(MAKS_LINI_W_KONSOLI, false));
+
+        panelStatusu.add(konsola);
+        
+        dodajKomunikatDoKonsoli("Tomek");
+//        dodajKomunikatDoKonsoli("Tomek1");
+//        dodajKomunikatDoKonsoli("Tomek2");
+//        dodajKomunikatDoKonsoli("Tomek3");
+//        dodajKomunikatDoKonsoli("Tomek4");
+//        dodajKomunikatDoKonsoli("Tomek5");
+//        dodajKomunikatDoKonsoli("Tomek6");
+//        dodajKomunikatDoKonsoli("Tomek7");
+//        dodajKomunikatDoKonsoli("Tomek8");
+//        dodajKomunikatDoKonsoli("Tomek9");
+//        dodajKomunikatDoKonsoli("Tomek10");
     	
         c.fill = GridBagConstraints.HORIZONTAL;
         c.ipady = 0;       //reset to default
@@ -136,6 +155,17 @@ public class MainWindow extends JFrame {
         c.gridy = 2;       //third row
         pane.add(panelStatusu, c);
     	
+    }
+    
+    public void dodajKomunikatDoKonsoli(String text){
+        konsola.setText(text + "\n" + konsola.getText());
+        
+        //textArea.append(text + newline);
+        konsola.selectAll();
+
+        //Make sure the new text is visible, even if there
+        //was a selection in the text area.
+        konsola.setCaretPosition(0);
     }
 
     public static void main(String[] args) {

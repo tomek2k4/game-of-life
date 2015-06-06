@@ -117,15 +117,27 @@ public class Mikroswiat extends JPanel{
 
             int index = selectedCell.x + (selectedCell.y * columnCount);
             Komorka cell = cells.get(index);
-            cell.setStan(StanKomorkiEnum.ZYWA);
-            g2d.setColor(Color.BLACK);
-            g2d.fill(cell);
-
+            
+            // Toggle state of selected cell
+            if(cell.getStan().equals(StanKomorkiEnum.MARTWA)){
+            	cell.setStan(StanKomorkiEnum.ZYWA);
+            }else if(cell.getStan().equals(StanKomorkiEnum.ZYWA)){
+            	cell.setStan(StanKomorkiEnum.MARTWA);
+            }else{
+            	//default, should never get here
+            	cell.setStan(StanKomorkiEnum.MARTWA);
+            }
         }
 
-        g2d.setColor(Color.GRAY);
-        for (Rectangle cell : cells) {
+        //Redraw all states 
+        for (Komorka cell : cells) {
+        	g2d.setColor(Color.GRAY);
             g2d.draw(cell);
+            if(cell.getStan().equals(StanKomorkiEnum.ZYWA)){
+            	cell.setStan(StanKomorkiEnum.ZYWA);
+            	g2d.setColor(Color.BLACK);            	
+            	g2d.fill(cell);
+            }
         }
 
         g2d.dispose();
