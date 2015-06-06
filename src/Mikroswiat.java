@@ -17,7 +17,7 @@ public class Mikroswiat extends JPanel{
 
     private int columnCount;
     private int rowCount;
-    private List<Rectangle> cells;
+    private List<Komorka> cells;
     private Point selectedCell;
 	private Dimension wymiarPlanszy;
 
@@ -31,25 +31,45 @@ public class Mikroswiat extends JPanel{
   
         MouseAdapter mouseHandler;
         mouseHandler = new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                Point point = e.getPoint();
 
-                int width = getWidth();
-                int height = getHeight();
+			@Override
+			public void mouseReleased(MouseEvent e) {
+              Point point = e.getPoint();
 
-                int cellWidth = width / columnCount;
-                int cellHeight = height / rowCount;
+              int width = getWidth();
+              int height = getHeight();
 
-                int column = e.getX() / cellWidth;
-                int row = e.getY() / cellHeight;
+              int cellWidth = width / columnCount;
+              int cellHeight = height / rowCount;
 
-                selectedCell = new Point(column, row);
-                repaint();
+              int column = e.getX() / cellWidth;
+              int row = e.getY() / cellHeight;
 
-            }
+              selectedCell = new Point(column, row);
+              repaint();	
+			}
+        	  
+        	
+        	
+//            @Override
+//            public void mouseMoved(MouseEvent e) {
+//                Point point = e.getPoint();
+//
+//                int width = getWidth();
+//                int height = getHeight();
+//
+//                int cellWidth = width / columnCount;
+//                int cellHeight = height / rowCount;
+//
+//                int column = e.getX() / cellWidth;
+//                int row = e.getY() / cellHeight;
+//
+//                selectedCell = new Point(column, row);
+//                repaint();
+//
+//            }
         };
-        //addMouseMotionListener(mouseHandler);
+        addMouseListener(mouseHandler);
     }
 
     @Override
@@ -77,15 +97,17 @@ public class Mikroswiat extends JPanel{
 
         int xOffset = (width - (columnCount * cellWidth)) / 2;
         int yOffset = (height - (rowCount * cellHeight)) / 2;
-
+ 
+        //Initialization
         if (cells.isEmpty()) {
             for (int row = 0; row < rowCount; row++) {
                 for (int col = 0; col < columnCount; col++) {
-                    Rectangle cell = new Rectangle(
+                    Komorka cell =  new Komorka(
                             xOffset + (col * cellWidth),
                             yOffset + (row * cellHeight),
                             cellWidth,
                             cellHeight);
+                    cell.setStan(StanKomorkiEnum.MARTWA);
                     cells.add(cell);
                 }
             }
@@ -94,8 +116,9 @@ public class Mikroswiat extends JPanel{
         if (selectedCell != null) {
 
             int index = selectedCell.x + (selectedCell.y * columnCount);
-            Rectangle cell = cells.get(index);
-            g2d.setColor(Color.BLUE);
+            Komorka cell = cells.get(index);
+            cell.setStan(StanKomorkiEnum.ZYWA);
+            g2d.setColor(Color.BLACK);
             g2d.fill(cell);
 
         }
