@@ -104,10 +104,9 @@ public class MainWindow extends JFrame {
     
     public void addOtherComponentsToPane(Container pane) {
     	
-
-    	GridLayout panelSterowaniaLayout = new GridLayout(3,1, 5, 5);  	
+	
     	Border empty = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-    	panelSterowania.setLayout(panelSterowaniaLayout);
+    	panelSterowania.setLayout(new GridLayout(3,1, 5, 5));
     	panelSterowania.add(startButton);
     	panelSterowania.add(pauzaButton);
     	panelSterowania.add(krokButton);
@@ -122,38 +121,66 @@ public class MainWindow extends JFrame {
     	c.anchor = c.NORTH;
     	pane.add(panelSterowania, c);
     	
-        panelStatusu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
-        konsola = new JTextArea();
-        konsola.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(konsola);
+    	
+    	empty = BorderFactory.createEmptyBorder(5, 5, 5, 5);
+    	panelStatusu.setLayout(new GridLayout(1,1, 5, 5));
+    	konsola = new JTextArea(2, 30);
+    	konsola.setEditable(false);
+	    JScrollPane scrollPane = new JScrollPane(konsola);
+//			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, 
+//			JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        konsola.getDocument().addDocumentListener(new LimitLinesDocumentListener(MAKS_LINI_W_KONSOLI, false));
+        panelStatusu.add(konsola);
+        ((JComponent) panelStatusu).setBorder(empty);
+        
+//    	JButton button = new JButton("Long-Named Button 4");
+    	c.fill = GridBagConstraints.HORIZONTAL;
+    	c.ipady = 10;      //make this component tall
+    	c.weightx = 0.0;
+    	c.gridwidth = 3;
+    	c.gridx = 0;
+    	c.gridy = 1;
+    	pane.add(konsola, c);
+    	
+    	
+//        panelStatusu.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
+//        konsola = new JTextArea(5,10);
+//        konsola.setEditable(false);
+//        JScrollPane scrollPane = new JScrollPane(konsola);
 //        		JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 //        		JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        konsola.getDocument().addDocumentListener(
-        		new LimitLinesDocumentListener(MAKS_LINI_W_KONSOLI, false));
-
-        panelStatusu.add(konsola);
-        
+//        konsola.getDocument().addDocumentListener(
+//        		new LimitLinesDocumentListener(MAKS_LINI_W_KONSOLI, false));
+//
+//        panelStatusu.add(konsola);
+//        
         dodajKomunikatDoKonsoli("Tomek");
-//        dodajKomunikatDoKonsoli("Tomek1");
-//        dodajKomunikatDoKonsoli("Tomek2");
-//        dodajKomunikatDoKonsoli("Tomek3");
-//        dodajKomunikatDoKonsoli("Tomek4");
-//        dodajKomunikatDoKonsoli("Tomek5");
-//        dodajKomunikatDoKonsoli("Tomek6");
-//        dodajKomunikatDoKonsoli("Tomek7");
-//        dodajKomunikatDoKonsoli("Tomek8");
-//        dodajKomunikatDoKonsoli("Tomek9");
-//        dodajKomunikatDoKonsoli("Tomek10");
-    	
+        dodajKomunikatDoKonsoli("Tomek1");
+        dodajKomunikatDoKonsoli("Tomek2");
+        dodajKomunikatDoKonsoli("Tomek3");
+        dodajKomunikatDoKonsoli("Tomek4");
+        dodajKomunikatDoKonsoli("Tomek5");
+        dodajKomunikatDoKonsoli("Tomek6");
+        dodajKomunikatDoKonsoli("Tomek7");
+        dodajKomunikatDoKonsoli("Tomek8");
+        dodajKomunikatDoKonsoli("Tomek9");
+        dodajKomunikatDoKonsoli("Tomek10");
+//    	
+        
+
+
+        
+        
+        JLabel label = new JLabel();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.ipady = 0;       //reset to default
         c.weighty = 1.0;   //request any extra vertical space
         c.anchor = GridBagConstraints.PAGE_END; //bottom of space
-        c.insets = new Insets(10,0,0,0);  //top padding
-        c.gridx = 0;       //aligned with button 2
+        //c.insets = new Insets(10,0,0,0);  //top padding
+        c.gridx = 1;       //aligned with button 2
         c.gridwidth = 2;   //2 columns wide
         c.gridy = 2;       //third row
-        pane.add(panelStatusu, c);
+        pane.add(label, c);
     	
     }
     
@@ -169,7 +196,7 @@ public class MainWindow extends JFrame {
     }
 
     public static void main(String[] args) {
-    	MainWindow okno = new MainWindow(WielkoscPlanszyEnum.SREDNIA);
+    	MainWindow okno = new MainWindow(WielkoscPlanszyEnum.MALA);
 
     }
 	
