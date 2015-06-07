@@ -5,6 +5,9 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.util.Observable;
+import java.util.Observer;
+
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -15,7 +18,7 @@ import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
 
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements Observer {
 	
 	private static final int ILOSC_LINI_PANELU_STATUSU = 3;
 	private static final int MAKS_LINI_W_KONSOLI = 1000;
@@ -64,7 +67,7 @@ public class MainWindow extends JFrame {
         this.addPanelSterowania();
         this.addPanelStatusu();
         
-        dodajKomunikatDoKonsoli("Rozloz komurki klikajac myszka lub zaladuj z pliku. Gdy juz skonczysz uruchom symulacje za pomoca przyciskow.");
+        dodajKomunikatDoKonsoli("Rozloz komorki klikajac myszka lub zaladuj z pliku. Gdy juz skonczysz uruchom symulacje za pomoca przyciskow.");
         
         //Display the window.
         this.pack();
@@ -74,13 +77,13 @@ public class MainWindow extends JFrame {
     public void addMikroswiatPanel(){
     	if(mikroswiat!=null){
     		Border border = BorderFactory.createLineBorder(Color.BLACK);
-    		((JComponent) mikroswiat).setBorder(border);
+    		((JComponent) mikroswiat.getMikroswiatJPanel()).setBorder(border);
     		GridBagConstraints c = new GridBagConstraints();
     		c.fill = GridBagConstraints.HORIZONTAL;
     		c.gridx = 0;
     		c.gridy = 0;
     		c.weighty = 0;
-    		getContentPane().add(mikroswiat, c);    		
+    		getContentPane().add(mikroswiat.getMikroswiatJPanel(), c);    		
     	}
     }
     
@@ -143,4 +146,10 @@ public class MainWindow extends JFrame {
     public static void main(String[] args) {
     	MainWindow okno = new MainWindow(WielkoscPlanszyEnum.MALA);
     }
+
+	@Override
+	public void update(Observable o, Object arg) {
+		// TODO Auto-generated method stub
+		
+	}
 }
