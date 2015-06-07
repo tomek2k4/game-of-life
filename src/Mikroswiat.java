@@ -7,7 +7,7 @@ import java.util.List;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
+import java.util.Observable;
 
 import javax.swing.JPanel;
 
@@ -16,8 +16,10 @@ public class Mikroswiat extends JPanel{
 
     private int columnCount;
     private int rowCount;
-    private List<Komorka> cells;
-    private Point selectedCell;
+    private List<Komorka> stanMikroswiata;
+
+
+	private Point wybranaKomorka;
 	private Dimension wymiarPlanszy;
 
     public Mikroswiat(WielkoscPlanszyEnum plansza) {
@@ -26,7 +28,7 @@ public class Mikroswiat extends JPanel{
     	rowCount = plansza.getWymiar().width / Komorka.CELL_SIZE;
     	columnCount = plansza.getWymiar().height / Komorka.CELL_SIZE;
     	
-    	cells = new ArrayList<>(columnCount * rowCount);
+    	stanMikroswiata = new ArrayList<>(columnCount * rowCount);
   
         MouseAdapter mouseHandler;
         mouseHandler = new MouseAdapter() {
@@ -44,7 +46,7 @@ public class Mikroswiat extends JPanel{
               int column = e.getX() / cellWidth;
               int row = e.getY() / cellHeight;
 
-              selectedCell = new Point(column, row);
+              wybranaKomorka = new Point(column, row);
               repaint();	
 			}
         	  
@@ -76,8 +78,8 @@ public class Mikroswiat extends JPanel{
 
     @Override
     public void invalidate() {
-        cells.clear();
-        selectedCell = null;
+        stanMikroswiata.clear();
+        wybranaKomorka = null;
         super.invalidate();
     }
 
@@ -96,7 +98,7 @@ public class Mikroswiat extends JPanel{
         int yOffset = (height - (rowCount * cellHeight)) / 2;
  
         //Initialization
-        if (cells.isEmpty()) {
+        if (stanMikroswiata.isEmpty()) {
             for (int row = 0; row < rowCount; row++) {
                 for (int col = 0; col < columnCount; col++) {
                     Komorka cell =  new Komorka(
@@ -105,15 +107,15 @@ public class Mikroswiat extends JPanel{
                             cellWidth,
                             cellHeight);
                     cell.setStan(StanKomorkiEnum.MARTWA);
-                    cells.add(cell);
+                    stanMikroswiata.add(cell);
                 }
             }
         }
 
-        if (selectedCell != null) {
+        if (wybranaKomorka != null) {
 
-            int index = selectedCell.x + (selectedCell.y * columnCount);
-            Komorka cell = cells.get(index);
+            int index = wybranaKomorka.x + (wybranaKomorka.y * columnCount);
+            Komorka cell = stanMikroswiata.get(index);
             
             // Toggle state of selected cell
             if(cell.getStan().equals(StanKomorkiEnum.MARTWA)){
@@ -124,11 +126,11 @@ public class Mikroswiat extends JPanel{
             	//default, should never get here
             	cell.setStan(StanKomorkiEnum.MARTWA);
             }
-            selectedCell = null;
+            wybranaKomorka = null;
         }
 
         //Redraw all states 
-        for (Komorka cell : cells) {
+        for (Komorka cell : stanMikroswiata) {
         	g2d.setColor(Color.GRAY);
             g2d.draw(cell);
             if(cell.getStan().equals(StanKomorkiEnum.ZYWA)){
@@ -140,5 +142,13 @@ public class Mikroswiat extends JPanel{
 
         g2d.dispose();
     }
+    
+    public List<Komorka> getStanMikroswiata() {
+		return stanMikroswiata;
+	}
+
+	public void setStanMikroswiata(List<Komorka> stanMikroswiata) {
+		this.stanMikroswiata = stanMikroswiata;
+	}
 }
 	

@@ -35,6 +35,8 @@ public class MainWindow extends JFrame {
     private JButton startButton = new JButton("Start");
     private JButton pauzaButton = new JButton("Pauza");
     private JButton krokButton = new JButton("Do przodu");
+    private JButton zapiszButton = new JButton("Zapisz");
+    private JButton zaladujButton = new JButton("Zaladuj");
     
     public MainWindow(WielkoscPlanszyEnum plansza){
     	super("Gra w Zycie");
@@ -62,6 +64,8 @@ public class MainWindow extends JFrame {
         this.addPanelSterowania();
         this.addPanelStatusu();
         
+        dodajKomunikatDoKonsoli("Rozloz komurki klikajac myszka lub zaladuj z pliku. Gdy juz skonczysz uruchom symulacje za pomoca przyciskow.");
+        
         //Display the window.
         this.pack();
         this.setVisible(true);
@@ -82,10 +86,12 @@ public class MainWindow extends JFrame {
     
     public void addPanelSterowania(){
 
-    	panelSterowania.setLayout(new GridLayout(3,1,0,0));
+    	panelSterowania.setLayout(new GridLayout(5,1,0,0));
     	panelSterowania.add(startButton);
     	panelSterowania.add(pauzaButton);
     	panelSterowania.add(krokButton);
+    	panelSterowania.add(zapiszButton);
+    	panelSterowania.add(zaladujButton);
     	
        	GridBagConstraints c = new GridBagConstraints();
     	c.fill = GridBagConstraints.HORIZONTAL;
@@ -109,21 +115,7 @@ public class MainWindow extends JFrame {
         konsola.getDocument().addDocumentListener(new LimitLinesDocumentListener(MAKS_LINI_W_KONSOLI, false));
         panelStatusu.add(scrollPane);
         ((JComponent) panelStatusu).setBorder(empty);
-            	
-    	
-        dodajKomunikatDoKonsoli("Tomekdkaf kadfmadklfjalkfjadsk fadfjadkfjaldsjfasdkjfladfjadlskfjladskfjladksjf");
-        dodajKomunikatDoKonsoli("Tomek1");
-        dodajKomunikatDoKonsoli("Tomek2");
-        dodajKomunikatDoKonsoli("Tomek3");
-        dodajKomunikatDoKonsoli("Tomek4 i Agnieszka poszli na lody o godzinie 12.55 czasu wschodnioeuropejskiego laalalalallalallalalalalalalalalalalalalalalalalalalalalalalala");
-        dodajKomunikatDoKonsoli("Tomek5");
-        dodajKomunikatDoKonsoli("Tomek6");
-        dodajKomunikatDoKonsoli("Tomek7");
-        dodajKomunikatDoKonsoli("Tomek8");
-        dodajKomunikatDoKonsoli("Tomek9");
-        dodajKomunikatDoKonsoli("Tomek10");
-   	
-       
+        
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.ipady = 0;       //reset to default
