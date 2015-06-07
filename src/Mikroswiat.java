@@ -5,10 +5,9 @@ import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Observable;
+
 
 import javax.swing.JPanel;
 
@@ -49,8 +48,6 @@ public class Mikroswiat extends JPanel{
               repaint();	
 			}
         	  
-        	
-        	
 //            @Override
 //            public void mouseMoved(MouseEvent e) {
 //                Point point = e.getPoint();
@@ -127,6 +124,7 @@ public class Mikroswiat extends JPanel{
             	//default, should never get here
             	cell.setStan(StanKomorkiEnum.MARTWA);
             }
+            selectedCell = null;
         }
 
         //Redraw all states 
