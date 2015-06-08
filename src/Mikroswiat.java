@@ -16,7 +16,7 @@ public class Mikroswiat extends Observable{
 
     private int columnCount;
     private int rowCount;
-    private List<Komorka> stanMikroswiata;
+    private List<Komorka> komorki;
 
 	private Point wybranaKomorka;
 	private Dimension wymiarPlanszy;
@@ -31,7 +31,7 @@ public class Mikroswiat extends Observable{
     	rowCount = plansza.getWymiar().width / Komorka.CELL_SIZE;
     	columnCount = plansza.getWymiar().height / Komorka.CELL_SIZE;
     	
-    	stanMikroswiata = new ArrayList<>(columnCount * rowCount);
+    	komorki = new ArrayList<>(columnCount * rowCount);
   
         MouseAdapter mouseHandler;
         mouseHandler = new MouseAdapter() {
@@ -69,7 +69,7 @@ public class Mikroswiat extends Observable{
     	
     	@Override
     	public void invalidate() {
-    		stanMikroswiata.clear();
+    		komorki.clear();
     		wybranaKomorka = null;
     		super.invalidate();
     	}
@@ -89,7 +89,7 @@ public class Mikroswiat extends Observable{
     		int yOffset = (height - (rowCount * cellHeight)) / 2;
     		
     		//Initialization
-    		if (stanMikroswiata.isEmpty()) {
+    		if (komorki.isEmpty()) {
     			for (int row = 0; row < rowCount; row++) {
     				for (int col = 0; col < columnCount; col++) {
     					Komorka cell =  new Komorka(
@@ -98,7 +98,7 @@ public class Mikroswiat extends Observable{
     							cellWidth,
     							cellHeight);
     					cell.setStan(StanKomorkiEnum.MARTWA);
-    					stanMikroswiata.add(cell);
+    					komorki.add(cell);
     				}
     			}
     		}
@@ -106,13 +106,15 @@ public class Mikroswiat extends Observable{
     		if (wybranaKomorka != null) {
     			
     			int index = wybranaKomorka.x + (wybranaKomorka.y * columnCount);
-    			Komorka cell = stanMikroswiata.get(index);
+    			Komorka cell = komorki.get(index);
     			
     			// Toggle state of selected cell
     			if(cell.getStan().equals(StanKomorkiEnum.MARTWA)){
     				cell.setStan(StanKomorkiEnum.ZYWA);
+    				zmianaStanu(ZrodloZmianyEnum.UZYTKOWNIK, 1, 0);
     			}else if(cell.getStan().equals(StanKomorkiEnum.ZYWA)){
     				cell.setStan(StanKomorkiEnum.MARTWA);
+    				zmianaStanu(ZrodloZmianyEnum.UZYTKOWNIK, 0, 1);
     			}else{
     				//default, should never get here
     				cell.setStan(StanKomorkiEnum.MARTWA);
@@ -121,7 +123,7 @@ public class Mikroswiat extends Observable{
     		}
     		
     		//Redraw all states 
-    		for (Komorka cell : stanMikroswiata) {
+    		for (Komorka cell : komorki) {
     			g2d.setColor(Color.GRAY);
     			g2d.draw(cell);
     			if(cell.getStan().equals(StanKomorkiEnum.ZYWA)){
@@ -138,12 +140,7 @@ public class Mikroswiat extends Observable{
     
     private void zmianaStanu(ZrodloZmianyEnum zrodlo,int liczbaNarodzonych,int liczbaUsmierconych) {
         setChanged();
-        
-    
         notifyObservers(new StanMikroswiata(zrodlo,liczbaNarodzonych,liczbaUsmierconych));
-        
-        
-        
         clearChanged();
     }
 	
@@ -157,11 +154,11 @@ public class Mikroswiat extends Observable{
 	}
     
     public List<Komorka> getStanMikroswiata() {
-		return stanMikroswiata;
+		return komorki;
 	}
 
 	public void setStanMikroswiata(List<Komorka> stanMikroswiata) {
-		this.stanMikroswiata = stanMikroswiata;
+		this.komorki = stanMikroswiata;
 	}
 }
 	

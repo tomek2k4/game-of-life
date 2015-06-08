@@ -2,6 +2,7 @@
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -16,6 +17,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
+import javax.swing.text.StyledEditorKit.BoldAction;
 
 
 public class MainWindow extends JFrame implements Observer {
@@ -57,6 +59,7 @@ public class MainWindow extends JFrame implements Observer {
         
     	//Create Mikroswiat Panel
     	this.mikroswiat = new Mikroswiat(plansza);
+    	this.mikroswiat.addObserver(this);
 
     	//Create and set up the window.
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -68,7 +71,7 @@ public class MainWindow extends JFrame implements Observer {
         this.addPanelStatusu();
         
         dodajKomunikatDoKonsoli("Rozloz komorki klikajac myszka lub zaladuj z pliku. Gdy juz skonczysz uruchom symulacje za pomoca przyciskow.");
-        
+       
         //Display the window.
         this.pack();
         this.setVisible(true);
@@ -112,6 +115,8 @@ public class MainWindow extends JFrame implements Observer {
     	konsola = new JTextArea(ILOSC_LINI_PANELU_STATUSU,20);
     	konsola.setEditable(false);
     	konsola.setLineWrap(true);
+    	konsola.setFont(new Font("Verdana", Font.PLAIN, 11));
+    	//konsola.setFont(konsola.getFont().deriveFont(10));
 	    JScrollPane scrollPane = new JScrollPane(konsola,
 			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
 			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
@@ -149,7 +154,33 @@ public class MainWindow extends JFrame implements Observer {
 
 	@Override
 	public void update(Observable o, Object arg) {
-		// TODO Auto-generated method stub
+		StanMikroswiata sm = (StanMikroswiata)arg;
+		StringBuilder str = new StringBuilder();
+		
+		
+		if(sm.getZrodlo() == ZrodloZmianyEnum.UZYTKOWNIK){
+			str.append("Gracz ");
+			if(sm.getLiczbaNarodzonychKomorek()>0){
+				str.append("stworzyl jedna nowa komorke");
+				if(sm.getLiczbaUsmierconychKomorek()>0){
+					str.append(" oraz ");
+				}
+			}else{
+				str.append("usmiercil jedna zyjaca komorke");
+			}
+		}else{
+			str.append("Zycie ");
+			if(sm.getLiczbaNarodzonychKomorek()>0){
+				str.append("stworzylo "+sm.getLiczbaNarodzonychKomorek()+" nowych komorek");
+				if(sm.getLiczbaUsmierconychKomorek()>0){
+					str.append(" oraz ");
+				}
+			}else{
+				str.append("usmiercilo "+sm.getLiczbaUsmierconychKomorek()+" zyjacych komorek");
+			}
+		}
+		
+		dodajKomunikatDoKonsoli(str.toString());
 		
 	}
 }
