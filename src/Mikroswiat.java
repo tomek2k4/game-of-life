@@ -17,6 +17,8 @@ public class Mikroswiat extends Observable{
     private int columnCount;
     private int rowCount;
     private List<Komorka> komorki;
+    private int liczbaZyjacychKomorek;
+    private int liczbaMartwychKomorek;
 
 	private Point wybranaKomorka;
 	private Dimension wymiarPlanszy;
@@ -61,7 +63,7 @@ public class Mikroswiat extends Observable{
 
 
 	private class MikroswiatJPanel extends JPanel{
-    	
+    			
     	@Override
     	public Dimension getPreferredSize() {
     		return wymiarPlanszy;
@@ -103,18 +105,19 @@ public class Mikroswiat extends Observable{
     			}
     		}
     		
-    		if (wybranaKomorka != null) {
-    			
+    		int stworzone = 0;
+    		int usmiercone = 0;
+    		
+    		if (wybranaKomorka != null) {	
     			int index = wybranaKomorka.x + (wybranaKomorka.y * columnCount);
     			Komorka cell = komorki.get(index);
-    			
     			// Toggle state of selected cell
     			if(cell.getStan().equals(StanKomorkiEnum.MARTWA)){
     				cell.setStan(StanKomorkiEnum.ZYWA);
-    				zmianaStanu(ZrodloZmianyEnum.UZYTKOWNIK, 1, 0);
+    				stworzone = 1;
     			}else if(cell.getStan().equals(StanKomorkiEnum.ZYWA)){
     				cell.setStan(StanKomorkiEnum.MARTWA);
-    				zmianaStanu(ZrodloZmianyEnum.UZYTKOWNIK, 0, 1);
+    				usmiercone = 1;
     			}else{
     				//default, should never get here
     				cell.setStan(StanKomorkiEnum.MARTWA);
@@ -122,33 +125,33 @@ public class Mikroswiat extends Observable{
     			wybranaKomorka = null;
     		}
     		
+    	    liczbaZyjacychKomorek = 0;
+    	    liczbaMartwychKomorek = 0;
+    		
     		//Redraw all states 
     		for (Komorka cell : komorki) {
     			g2d.setColor(Color.GRAY);
     			g2d.draw(cell);
     			if(cell.getStan().equals(StanKomorkiEnum.ZYWA)){
+    				liczbaZyjacychKomorek++;
     				cell.setStan(StanKomorkiEnum.ZYWA);
     				g2d.setColor(Color.BLACK);            	
     				g2d.fill(cell);
+    			}else if(cell.getStan().equals(StanKomorkiEnum.MARTWA)){
+    				liczbaMartwychKomorek++;
     			}
     		}
-    		
     		g2d.dispose();
+    		zmianaStanu(ZrodloZmianyEnum.UZYTKOWNIK, stworzone, usmiercone,liczbaZyjacychKomorek,liczbaMartwychKomorek);
     	}
     }
 
-    
-    private void zmianaStanu(ZrodloZmianyEnum zrodlo,int liczbaNarodzonych,int liczbaUsmierconych) {
+    private void zmianaStanu(ZrodloZmianyEnum zrodlo,int liczbaNarodzonych,int liczbaUsmierconych, int liczbaZyjacychKomorek, int liczbaMartwychKomorek) {
         setChanged();
-        notifyObservers(new StanMikroswiata(zrodlo,liczbaNarodzonych,liczbaUsmierconych));
+        notifyObservers(new StanMikroswiata(zrodlo,liczbaNarodzonych,liczbaUsmierconych,liczbaZyjacychKomorek,liczbaMartwychKomorek));
         clearChanged();
     }
-	
-	
-	
-	
-    
-    
+   
     public MikroswiatJPanel getMikroswiatJPanel() {
 		return mikroswiatJPanel;
 	}

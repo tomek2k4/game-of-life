@@ -6,6 +6,9 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -17,10 +20,18 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
-import javax.swing.text.StyledEditorKit.BoldAction;
 
 
-public class MainWindow extends JFrame implements Observer {
+
+public class MainWindow extends JFrame implements Observer,ActionListener {
+	
+	private enum Actions {
+	    START,
+	    PAUZA,
+	    DO_PRZODU,
+	    ZAPISZ,
+	    ZALADUJ
+	  }
 	
 	private static final int ILOSC_LINI_PANELU_STATUSU = 3;
 	private static final int MAKS_LINI_W_KONSOLI = 1000;
@@ -97,6 +108,8 @@ public class MainWindow extends JFrame implements Observer {
     	panelSterowania.add(pauzaButton);
     	panelSterowania.add(krokButton);
     	panelSterowania.add(zapiszButton);
+    	zapiszButton.setActionCommand(Actions.ZAPISZ.name());
+    	zapiszButton.addActionListener(this);
     	panelSterowania.add(zaladujButton);
     	
        	GridBagConstraints c = new GridBagConstraints();
@@ -180,7 +193,27 @@ public class MainWindow extends JFrame implements Observer {
 			}
 		}
 		
-		dodajKomunikatDoKonsoli(str.toString());
-		
+		if(sm.getLiczbaNarodzonychKomorek() != 0 || sm.getLiczbaUsmierconychKomorek() != 0){
+			//Zmiana jaka nastapila
+			dodajKomunikatDoKonsoli(str.toString());
+			
+			//podsumowanie stanu obecnego
+			dodajKomunikatDoKonsoli("Obecnie jest "+sm.getLiczbaZyjacych()+" zyjacych komorek oraz "+
+								sm.getLiczbaMartwych()+ " martwych");
+		}
+
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent evt) {
+		if (evt.getActionCommand() == Actions.ZAPISZ.name()) {
+			try {
+				StanGry.zapisz(mikroswiat.getStanMikroswiata());
+				dodajKomunikatDoKonsoli("Zapisano stan gry pod nazwa pliku: "+StanGry.getNazwaPliku());
+			} catch (IOException e) {
+				dodajKomunikatDoKonsoli("Zapisanie stanu gry nie powiodlo sie!");
+				e.printStackTrace();
+			}
+		}
 	}
 }
