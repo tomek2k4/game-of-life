@@ -1,5 +1,5 @@
 
 public enum ZrodloZmianyEnum {
 
-	UZYTKOWNIK,ZYCIE
+	UZYTKOWNIK,ZYCIE,ODCZYT_PLIKU
 }

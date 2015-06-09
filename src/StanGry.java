@@ -1,18 +1,25 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
 
 
-public class StanGry {
+public class StanGry extends Observable{
 	
 	private static final String NAZWA_PLIKU = new String("gra_w_zycie_zapis.txt");
+	private static final String ZNACZNIK_ZYWA_KOMORKA = new String("z");
+	private static final String ZNACZNIK_MARTWA_KOMORKA = new String("m");
 	
-	public static void zapisz(List<Komorka> komorki) throws IOException{
+	public void zapisz(List<Komorka> komorki) throws IOException{
         try (Writer w = new FileWriter(NAZWA_PLIKU)){
             
         	for (int i=0;i<komorki.size();i++) {
-        		w.write(komorki.get(i).getStan().equals(StanKomorkiEnum.ZYWA) ? "z" : "m");
+        		w.write(komorki.get(i).getStan().equals(StanKomorkiEnum.ZYWA) ? ZNACZNIK_ZYWA_KOMORKA : ZNACZNIK_MARTWA_KOMORKA);
         		if (i!=komorki.size()-1)
 					w.write(",");
 				else
@@ -24,9 +31,58 @@ public class StanGry {
         }
 	}
 
-	public static void zaladuj(){
+	public void zaladuj(List<Komorka> komorki) throws IOException,IndexOutOfBoundsException{
+		int liczbaNarodzonych = 0;
+		int liczbaUsmierconych = 0;
+		int liczbaZyjacych = 0;
+		int liczbaMartwych = 0;
 		
+		
+        try (Reader inp = new FileReader(NAZWA_PLIKU)) {
+        	Komorka komorka;
+        	BufferedReader br = new BufferedReader(inp);
+        	String line = null;
+        	int i = 0;
+        	while ((line = br.readLine()) != null) {
+                for(String stanStr:line.split(",|;")){         	
+                	try{
+                		komorka = komorki.get(i);
+                		if(stanStr.equals(ZNACZNIK_ZYWA_KOMORKA)){
+                			liczbaZyjacych++;
+                			if(komorka.getStan()!=StanKomorkiEnum.ZYWA){
+                				liczbaNarodzonych++;
+                				komorka.setStan(StanKomorkiEnum.ZYWA);
+                			}
+                		}else{
+                			liczbaMartwych++;
+                			if(komorka.getStan()!=StanKomorkiEnum.MARTWA){
+                				liczbaUsmierconych++;
+                				komorka.setStan(StanKomorkiEnum.MARTWA);
+                			}
+                		}              		
+//                		komorki.get(i).setStan(
+//                				stanStr.equals(ZNACZNIK_ZYWA_KOMORKA)?StanKomorkiEnum.ZYWA:StanKomorkiEnum.MARTWA);
+                	}catch(IndexOutOfBoundsException e){
+                		throw e;
+                	}
+					i++;
+                }
+
+            }
+        } catch (IOException e) {
+        	throw e;
+        }
+        zmianaStanu(ZrodloZmianyEnum.ODCZYT_PLIKU,liczbaNarodzonych, liczbaUsmierconych, liczbaZyjacych, liczbaMartwych); 
 	}
+	
+	
+    private void zmianaStanu(ZrodloZmianyEnum zrodlo,int liczbaNarodzonych,int liczbaUsmierconych, int liczbaZyjacychKomorek, int liczbaMartwychKomorek) {
+        setChanged();
+        notifyObservers(new StanMikroswiata(zrodlo,liczbaNarodzonych,liczbaUsmierconych,liczbaZyjacychKomorek,liczbaMartwychKomorek));
+        clearChanged();
+    }
+	
+	
 	
 	public static String getNazwaPliku() {
 		return NAZWA_PLIKU;

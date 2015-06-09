@@ -62,7 +62,7 @@ public class Mikroswiat extends Observable{
 
 
 
-	private class MikroswiatJPanel extends JPanel{
+	class MikroswiatJPanel extends JPanel{
     			
     	@Override
     	public Dimension getPreferredSize() {

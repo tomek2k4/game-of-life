@@ -47,12 +47,14 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 	private Container panelStatusu = new JPanel();
     private JTextArea konsola;
 	private Mikroswiat mikroswiat;
+	private StanGry stanGry;
 	
     private JButton startButton = new JButton("Start");
     private JButton pauzaButton = new JButton("Pauza");
     private JButton krokButton = new JButton("Do przodu");
     private JButton zapiszButton = new JButton("Zapisz");
     private JButton zaladujButton = new JButton("Zaladuj");
+	private boolean wczytanoPlik;
     
     public MainWindow(WielkoscPlanszyEnum plansza){
     	super("Gra w Zycie");
@@ -71,6 +73,9 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     	//Create Mikroswiat Panel
     	this.mikroswiat = new Mikroswiat(plansza);
     	this.mikroswiat.addObserver(this);
+    	
+    	this.stanGry = new StanGry();
+    	this.stanGry.addObserver(this);
 
     	//Create and set up the window.
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -111,6 +116,8 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     	zapiszButton.setActionCommand(Actions.ZAPISZ.name());
     	zapiszButton.addActionListener(this);
     	panelSterowania.add(zaladujButton);
+    	zaladujButton.setActionCommand(Actions.ZALADUJ.name());
+    	zaladujButton.addActionListener(this);
     	
        	GridBagConstraints c = new GridBagConstraints();
     	c.fill = GridBagConstraints.HORIZONTAL;
@@ -178,22 +185,38 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 				if(sm.getLiczbaUsmierconychKomorek()>0){
 					str.append(" oraz ");
 				}
-			}else{
+			}
+			if(sm.getLiczbaUsmierconychKomorek()>0){
 				str.append("usmiercil jedna zyjaca komorke");
 			}
-		}else{
+		}else if(sm.getZrodlo() == ZrodloZmianyEnum.ZYCIE){
 			str.append("Zycie ");
 			if(sm.getLiczbaNarodzonychKomorek()>0){
 				str.append("stworzylo "+sm.getLiczbaNarodzonychKomorek()+" nowych komorek");
 				if(sm.getLiczbaUsmierconychKomorek()>0){
 					str.append(" oraz ");
 				}
-			}else{
+			}
+			if(sm.getLiczbaUsmierconychKomorek()>0){
 				str.append("usmiercilo "+sm.getLiczbaUsmierconychKomorek()+" zyjacych komorek");
+			}
+		}else if(sm.getZrodlo() == ZrodloZmianyEnum.ODCZYT_PLIKU){
+			str.append("Po odczycie z pliku ");
+			if(sm.getLiczbaNarodzonychKomorek()>0){
+				str.append("narodzonych zostalo "+sm.getLiczbaNarodzonychKomorek()+" nowych komorek");
+				if(sm.getLiczbaUsmierconychKomorek()>0){
+					str.append(" oraz ");
+				}
+			}
+			
+			if(sm.getLiczbaUsmierconychKomorek()>0){
+				str.append("usmierconych zostalo "+sm.getLiczbaUsmierconychKomorek()+" zyjacych komorek");
 			}
 		}
 		
-		if(sm.getLiczbaNarodzonychKomorek() != 0 || sm.getLiczbaUsmierconychKomorek() != 0){
+		if(sm.getLiczbaNarodzonychKomorek() != 0 ||
+				sm.getLiczbaUsmierconychKomorek() != 0 ||
+				wczytanoPlik){
 			//Zmiana jaka nastapila
 			dodajKomunikatDoKonsoli(str.toString());
 			
@@ -208,10 +231,21 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 	public void actionPerformed(ActionEvent evt) {
 		if (evt.getActionCommand() == Actions.ZAPISZ.name()) {
 			try {
-				StanGry.zapisz(mikroswiat.getStanMikroswiata());
+				stanGry.zapisz(mikroswiat.getStanMikroswiata());
 				dodajKomunikatDoKonsoli("Zapisano stan gry pod nazwa pliku: "+StanGry.getNazwaPliku());
 			} catch (IOException e) {
 				dodajKomunikatDoKonsoli("Zapisanie stanu gry nie powiodlo sie!");
+				e.printStackTrace();
+			}
+		}else if(evt.getActionCommand() == Actions.ZALADUJ.name()){
+			try {
+				stanGry.zaladuj(mikroswiat.getStanMikroswiata());
+				//dodajKomunikatDoKonsoli("Poprawnie zaladowano stan gry z pliku");
+				mikroswiat.getMikroswiatJPanel().repaint();
+			} catch (IndexOutOfBoundsException e) {
+				dodajKomunikatDoKonsoli("Plansza jest za mala w porownaniu do zapisanego pliku");
+			} catch (IOException e) {
+				dodajKomunikatDoKonsoli("Nie odnalazl pliku ze stanem gry");
 				e.printStackTrace();
 			}
 		}
