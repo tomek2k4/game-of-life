@@ -46,8 +46,10 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 	private Container panelSterowania = new JPanel();
 	private Container panelStatusu = new JPanel();
     private JTextArea konsola;
-	private Mikroswiat mikroswiat;
+	
+    private Mikroswiat mikroswiat;
 	private StanGry stanGry;
+	private Zycie zycie;
 	
     private JButton startButton = new JButton("Start");
     private JButton pauzaButton = new JButton("Pauza");
@@ -77,6 +79,9 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     	this.stanGry = new StanGry();
     	this.stanGry.addObserver(this);
 
+    	this.zycie = new Zycie();
+    	this.zycie.addObserver(this);
+    	
     	//Create and set up the window.
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.getContentPane().setLayout(new GridBagLayout());
@@ -112,6 +117,8 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     	panelSterowania.add(startButton);
     	panelSterowania.add(pauzaButton);
     	panelSterowania.add(krokButton);
+    	krokButton.setActionCommand(Actions.DO_PRZODU.name());
+    	krokButton.addActionListener(this);	
     	panelSterowania.add(zapiszButton);
     	zapiszButton.setActionCommand(Actions.ZAPISZ.name());
     	zapiszButton.addActionListener(this);
@@ -169,7 +176,7 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     }
 
     public static void main(String[] args) {
-    	MainWindow okno = new MainWindow(WielkoscPlanszyEnum.MALA);
+    	MainWindow okno = new MainWindow(WielkoscPlanszyEnum.SREDNIA);
     }
 
 	@Override
@@ -248,6 +255,9 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 				dodajKomunikatDoKonsoli("Nie odnalazl pliku ze stanem gry");
 				e.printStackTrace();
 			}
+		}else if(evt.getActionCommand() == Actions.DO_PRZODU.name()){
+			zycie.jedenCykl(mikroswiat.getStanMikroswiata());
+			mikroswiat.getMikroswiatJPanel().repaint();
 		}
 	}
 }
