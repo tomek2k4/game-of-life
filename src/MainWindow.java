@@ -15,22 +15,28 @@ import java.util.Observer;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 
 
 public class MainWindow extends JFrame implements Observer,ActionListener {
 	
+	private static final Font FONT_SETUP = new Font("Verdana", Font.PLAIN, 11);
+
 	private enum Actions {
 	    START,
 	    PAUZA,
+	    ZALADUJ, 
+	    DEC_DO_PRZODU,
 	    DO_PRZODU,
-	    ZAPISZ,
-	    ZALADUJ
+	    ZAPISZ
 	  }
 	
 	private static final int ILOSC_LINI_PANELU_STATUSU = 3;
@@ -51,9 +57,12 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 	private StanGry stanGry;
 	private Zycie zycie;
 	
+	private JLabel regulaLabel = new JLabel("Regula:");
+	private JFormattedTextField regulaTextField = new JFormattedTextField();
     private JButton startButton = new JButton("Start");
     private JButton pauzaButton = new JButton("Pauza");
     private JButton krokButton = new JButton("Do przodu");
+    private JButton decKrokButton = new JButton("x10");
     private JButton zapiszButton = new JButton("Zapisz");
     private JButton zaladujButton = new JButton("Zaladuj");
 	private boolean wczytanoPlik;
@@ -113,12 +122,22 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     
     public void addPanelSterowania(){
 
-    	panelSterowania.setLayout(new GridLayout(5,1,0,0));
+    	panelSterowania.setLayout(new GridLayout(7,1,0,0));
+    	Container regulaCont = new JPanel(new GridLayout(2, 1));
+    	regulaLabel.setFont(FONT_SETUP);
+    	regulaLabel.setBorder(BorderFactory.createEmptyBorder(0,ODSTEP_PANELI,0,0));
+    	regulaCont.add(regulaLabel);
+    	regulaCont.add(regulaTextField);
+    	regulaTextField.setFont(FONT_SETUP);
+    	regulaTextField.setPreferredSize(wymiaryPrzycisku);
+    	panelSterowania.add(regulaCont);
     	panelSterowania.add(startButton);
     	panelSterowania.add(pauzaButton);
     	panelSterowania.add(krokButton);
     	krokButton.setActionCommand(Actions.DO_PRZODU.name());
-    	krokButton.addActionListener(this);	
+    	krokButton.addActionListener(this);
+    	panelSterowania.add(decKrokButton);
+    	decKrokButton.setActionCommand(Actions.DEC_DO_PRZODU.name());
     	panelSterowania.add(zapiszButton);
     	zapiszButton.setActionCommand(Actions.ZAPISZ.name());
     	zapiszButton.addActionListener(this);
@@ -142,7 +161,7 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     	konsola = new JTextArea(ILOSC_LINI_PANELU_STATUSU,20);
     	konsola.setEditable(false);
     	konsola.setLineWrap(true);
-    	konsola.setFont(new Font("Verdana", Font.PLAIN, 11));
+    	konsola.setFont(FONT_SETUP);
     	//konsola.setFont(konsola.getFont().deriveFont(10));
 	    JScrollPane scrollPane = new JScrollPane(konsola,
 			JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, 
@@ -258,6 +277,8 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 		}else if(evt.getActionCommand() == Actions.DO_PRZODU.name()){
 			zycie.jedenCykl(mikroswiat.getStanMikroswiata());
 			mikroswiat.getMikroswiatJPanel().repaint();
+		}else if(evt.getActionCommand() == Actions.DEC_DO_PRZODU.name()){
+			zycie.decCykl(mikroswiat.getStanMikroswiata());
 		}
 	}
 }

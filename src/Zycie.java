@@ -22,6 +22,12 @@ public class Zycie extends Observable implements Runnable{
 	}
 	
 	
+	public void decCykl(List<Komorka> stanMikroswiata) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
 	public void jedenCykl(List<Komorka> komorki) {
 		
 		wymiarMikroswiata = (int) Math.sqrt(komorki.size());
@@ -54,13 +60,11 @@ public class Zycie extends Observable implements Runnable{
 				}
 				if(czyPrzezyje == false) nowaKomorka.setStan(StanKomorkiEnum.MARTWA);
 			}
-			//nowyStanMikroswiata.add(nowaKomorka);
+
 		}
-		//komorki = nowyStanMikroswiata;
+
 	}
-	
-	
-	
+
 	private int znajdzLiczbeZywychSasiadow(List<Komorka> komorki,int idx) {
 		
 		IndeksyKomorek indeksySasiadow = new IndeksyKomorek();
@@ -97,11 +101,19 @@ public class Zycie extends Observable implements Runnable{
 		}
 	}
 
+    private void zmianaStanu(ZrodloZmianyEnum zrodlo,int liczbaNarodzonych,int liczbaUsmierconych, int liczbaZyjacychKomorek, int liczbaMartwychKomorek) {
+        setChanged();
+        notifyObservers(new StanMikroswiata(zrodlo,liczbaNarodzonych,liczbaUsmierconych,liczbaZyjacychKomorek,liczbaMartwychKomorek));
+        clearChanged();
+    }
 
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
 		
 	}
+
+
+
 
 }
