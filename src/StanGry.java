@@ -5,10 +5,10 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.List;
-import java.util.Observable;
 
 
-public class StanGry extends Observable{
+
+public class StanGry extends NotyfikatorGlownegoOkna{
 	
 	private static final String NAZWA_PLIKU = new String("gra_w_zycie_zapis.txt");
 	private static final String ZNACZNIK_ZYWA_KOMORKA = new String("z");
@@ -71,15 +71,8 @@ public class StanGry extends Observable{
         } catch (IOException e) {
         	throw e;
         }
-        zmianaStanu(ZrodloZmianyEnum.ODCZYT_PLIKU,liczbaNarodzonych, liczbaUsmierconych, liczbaZyjacych, liczbaMartwych); 
+        zmianaStanu(ZrodloZmianyEnum.ODCZYT_PLIKU,liczbaNarodzonych, liczbaUsmierconych, liczbaZyjacych, liczbaMartwych,0,0); 
 	}
-	
-	
-    private void zmianaStanu(ZrodloZmianyEnum zrodlo,int liczbaNarodzonych,int liczbaUsmierconych, int liczbaZyjacychKomorek, int liczbaMartwychKomorek) {
-        setChanged();
-        notifyObservers(new StanMikroswiata(zrodlo,liczbaNarodzonych,liczbaUsmierconych,liczbaZyjacychKomorek,liczbaMartwychKomorek));
-        clearChanged();
-    }
 	
 	
 	

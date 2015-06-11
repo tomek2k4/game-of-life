@@ -6,16 +6,23 @@ public class StanMikroswiata {
 	private Integer liczbaUsmierconychKomorek;
 	private Integer liczbaZyjacych;
 	private Integer liczbaMartwych;
+	private Integer zmianaCykli;
+	private Integer numerCyklu;
 	
-	
+
+
 	public StanMikroswiata(ZrodloZmianyEnum zrodlo,
-			Integer liczbaNarodzonychKomorek, Integer liczbaUsmierconychKomorek, int liczbaZyjacychKomorek, int liczbaMartwychKomorek) {
+			Integer liczbaNarodzonychKomorek, Integer liczbaUsmierconychKomorek, 
+			int liczbaZyjacychKomorek, int liczbaMartwychKomorek,
+			int zmianaCykli,int numerCyklu) {
 		super();
 		this.zrodlo = zrodlo;
 		this.liczbaNarodzonychKomorek = liczbaNarodzonychKomorek;
 		this.liczbaUsmierconychKomorek = liczbaUsmierconychKomorek;
 		this.liczbaZyjacych = liczbaZyjacychKomorek;
 		this.liczbaMartwych = liczbaMartwychKomorek;
+		this.zmianaCykli = zmianaCykli;
+		this.numerCyklu = numerCyklu;
 	}
 	
 	public ZrodloZmianyEnum getZrodlo() {
@@ -61,6 +68,21 @@ public class StanMikroswiata {
 
 	public void setLiczbaMartwych(Integer liczbaMartwych) {
 		this.liczbaMartwych = liczbaMartwych;
+	}
+	public Integer getNumerCyklu() {
+		return numerCyklu;
+	}
+
+	public void setNumerCyklu(Integer numerCyklu) {
+		this.numerCyklu = numerCyklu;
+	}
+	
+	public Integer getZmianaCykli() {
+		return zmianaCykli;
+	}
+
+	public void setZmianaCykli(Integer zmianaCykli) {
+		this.zmianaCykli = zmianaCykli;
 	}
 
 

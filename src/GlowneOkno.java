@@ -26,7 +26,7 @@ import javax.swing.border.Border;
 
 
 
-public class MainWindow extends JFrame implements Observer,ActionListener {
+public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	
 	private static final Font FONT_SETUP = new Font("Verdana", Font.PLAIN, 11);
 
@@ -67,7 +67,7 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     private JButton zaladujButton = new JButton("Zaladuj");
 	private boolean wczytanoPlik;
     
-    public MainWindow(WielkoscPlanszyEnum plansza){
+    public GlowneOkno(WielkoscPlanszyEnum plansza){
     	super("Gra w Zycie");
     	
     	wymiaryPrzycisku =  new JButton("default button").getPreferredSize();
@@ -138,6 +138,7 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     	krokButton.addActionListener(this);
     	panelSterowania.add(decKrokButton);
     	decKrokButton.setActionCommand(Actions.DEC_DO_PRZODU.name());
+    	decKrokButton.addActionListener(this);
     	panelSterowania.add(zapiszButton);
     	zapiszButton.setActionCommand(Actions.ZAPISZ.name());
     	zapiszButton.addActionListener(this);
@@ -195,13 +196,14 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
     }
 
     public static void main(String[] args) {
-    	MainWindow okno = new MainWindow(WielkoscPlanszyEnum.SREDNIA);
+    	GlowneOkno okno = new GlowneOkno(WielkoscPlanszyEnum.SREDNIA);
     }
 
 	@Override
 	public void update(Observable o, Object arg) {
 		StanMikroswiata sm = (StanMikroswiata)arg;
 		StringBuilder str = new StringBuilder();
+		String numerCykluInfo = "";
 		
 		
 		if(sm.getZrodlo() == ZrodloZmianyEnum.UZYTKOWNIK){
@@ -216,7 +218,8 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 				str.append("usmiercil jedna zyjaca komorke");
 			}
 		}else if(sm.getZrodlo() == ZrodloZmianyEnum.ZYCIE){
-			str.append("Zycie ");
+			str.append("Przez "+sm.getZmianaCykli()+" cykli");
+			str.append(" zycie ");
 			if(sm.getLiczbaNarodzonychKomorek()>0){
 				str.append("stworzylo "+sm.getLiczbaNarodzonychKomorek()+" nowych komorek");
 				if(sm.getLiczbaUsmierconychKomorek()>0){
@@ -246,9 +249,11 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 			//Zmiana jaka nastapila
 			dodajKomunikatDoKonsoli(str.toString());
 			
+			if(sm.getZrodlo().equals(ZrodloZmianyEnum.ZYCIE)) numerCykluInfo= new String(" L = "+sm.getNumerCyklu());
+			
 			//podsumowanie stanu obecnego
 			dodajKomunikatDoKonsoli("Obecnie jest "+sm.getLiczbaZyjacych()+" zyjacych komorek oraz "+
-								sm.getLiczbaMartwych()+ " martwych");
+								sm.getLiczbaMartwych()+ " martwych."+numerCykluInfo);
 		}
 
 	}
@@ -257,7 +262,7 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 	public void actionPerformed(ActionEvent evt) {
 		if (evt.getActionCommand() == Actions.ZAPISZ.name()) {
 			try {
-				stanGry.zapisz(mikroswiat.getStanMikroswiata());
+				stanGry.zapisz(mikroswiat.getListeKomorek());
 				dodajKomunikatDoKonsoli("Zapisano stan gry pod nazwa pliku: "+StanGry.getNazwaPliku());
 			} catch (IOException e) {
 				dodajKomunikatDoKonsoli("Zapisanie stanu gry nie powiodlo sie!");
@@ -265,7 +270,7 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 			}
 		}else if(evt.getActionCommand() == Actions.ZALADUJ.name()){
 			try {
-				stanGry.zaladuj(mikroswiat.getStanMikroswiata());
+				stanGry.zaladuj(mikroswiat.getListeKomorek());
 				//dodajKomunikatDoKonsoli("Poprawnie zaladowano stan gry z pliku");
 				mikroswiat.getMikroswiatJPanel().repaint();
 			} catch (IndexOutOfBoundsException e) {
@@ -275,10 +280,11 @@ public class MainWindow extends JFrame implements Observer,ActionListener {
 				e.printStackTrace();
 			}
 		}else if(evt.getActionCommand() == Actions.DO_PRZODU.name()){
-			zycie.jedenCykl(mikroswiat.getStanMikroswiata());
+			zycie.jedenCykl(mikroswiat.getListeKomorek());
 			mikroswiat.getMikroswiatJPanel().repaint();
 		}else if(evt.getActionCommand() == Actions.DEC_DO_PRZODU.name()){
-			zycie.decCykl(mikroswiat.getStanMikroswiata());
+			zycie.decCykl(mikroswiat.getListeKomorek());
+			mikroswiat.getMikroswiatJPanel().repaint();
 		}
 	}
 }

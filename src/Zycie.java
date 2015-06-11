@@ -1,14 +1,15 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.Observable;
 
 
-public class Zycie extends Observable implements Runnable{
+public class Zycie extends NotyfikatorGlownegoOkna implements Runnable{
 
+	private static final int DZIESIEC_CYKLI = 10;
 	private TreeSet<Integer> regulyPrzezycia;
 	private TreeSet<Integer> regulyNarodzin;	
 	private Integer wymiarMikroswiata;
+	private Integer numerKroku = 0;
 	
 	public Zycie() {
 		super();
@@ -22,25 +23,44 @@ public class Zycie extends Observable implements Runnable{
 	}
 	
 	
-	public void decCykl(List<Komorka> stanMikroswiata) {
-		// TODO Auto-generated method stub
-		
+	public void decCykl(List<Komorka> komorki) {
+		int ln=0,lu=0;
+
+		StanMikroswiata sm = null;
+		for(int i=0;i<DZIESIEC_CYKLI;i++){
+			sm = cykl(komorki);
+			ln = ln + sm.getLiczbaNarodzonychKomorek();
+			lu = lu + sm.getLiczbaUsmierconychKomorek();
+		}
+		zmianaStanu(sm.getZrodlo(), 
+				ln, 
+				lu, 
+				sm.getLiczbaZyjacych(), sm.getLiczbaMartwych(), 
+				10, sm.getNumerCyklu());
 	}
 	
+	public void jedenCykl(List<Komorka> komorki){
+		StanMikroswiata sm = cykl(komorki);
+		zmianaStanu(sm);
+	}
 	
-	public void jedenCykl(List<Komorka> komorki) {
-		
+	private StanMikroswiata cykl(List<Komorka> komorki) {
+		int liczbaNarodzonych = 0;
+		int liczbaUsmierconych = 0;
+		int liczbaZyjacychKomorek = 0;
+		int liczbaMartwychKomorek = 0;
 		wymiarMikroswiata = (int) Math.sqrt(komorki.size());
+		numerKroku++;
 		
 		List<Komorka> obecneKomorki = new ArrayList<Komorka>(); //current state
-//		List<Komorka> nowyStanMikroswiata =  new ArrayList<Komorka>(); //next state
+
 		// make a deep copy of list
 		for(Komorka komorka:komorki){
 			obecneKomorki.add((Komorka)komorka.clone());
 		}
 
 		for(int index=0;index<komorki.size();index++){
-			Komorka nowaKomorka = komorki.get(index);//(Komorka)(komorki.get(index).clone());
+			Komorka nowaKomorka = komorki.get(index);
 			Komorka obecnaKomorka = obecneKomorki.get(index);
 			int zyweKomorki = znajdzLiczbeZywychSasiadow(obecneKomorki,index);
 			if(obecnaKomorka.getStan().equals(StanKomorkiEnum.MARTWA)){
@@ -50,7 +70,13 @@ public class Zycie extends Observable implements Runnable{
 						czyNarodziSie = true;
 					}
 				}
-				if(czyNarodziSie==true) nowaKomorka.setStan(StanKomorkiEnum.ZYWA);
+				if(czyNarodziSie==true) {
+					nowaKomorka.setStan(StanKomorkiEnum.ZYWA);
+					liczbaNarodzonych++;
+					liczbaZyjacychKomorek++;
+				}else{
+					liczbaMartwychKomorek++;
+				}
 			}else if(obecnaKomorka.getStan().equals(StanKomorkiEnum.ZYWA)){
 				boolean czyPrzezyje = false;
 				for(Integer przezycie:regulyPrzezycia){
@@ -58,11 +84,20 @@ public class Zycie extends Observable implements Runnable{
 						czyPrzezyje = true;
 					}
 				}
-				if(czyPrzezyje == false) nowaKomorka.setStan(StanKomorkiEnum.MARTWA);
+				if(czyPrzezyje == false){
+					nowaKomorka.setStan(StanKomorkiEnum.MARTWA);
+					liczbaUsmierconych++;
+					liczbaMartwychKomorek++;
+				}else{
+					liczbaZyjacychKomorek++;
+				}
 			}
 
 		}
-
+	
+		return new StanMikroswiata(ZrodloZmianyEnum.ZYCIE, 
+				liczbaNarodzonych, liczbaUsmierconych, 
+				liczbaZyjacychKomorek, liczbaMartwychKomorek,1,numerKroku);
 	}
 
 	private int znajdzLiczbeZywychSasiadow(List<Komorka> komorki,int idx) {
@@ -101,11 +136,6 @@ public class Zycie extends Observable implements Runnable{
 		}
 	}
 
-    private void zmianaStanu(ZrodloZmianyEnum zrodlo,int liczbaNarodzonych,int liczbaUsmierconych, int liczbaZyjacychKomorek, int liczbaMartwychKomorek) {
-        setChanged();
-        notifyObservers(new StanMikroswiata(zrodlo,liczbaNarodzonych,liczbaUsmierconych,liczbaZyjacychKomorek,liczbaMartwychKomorek));
-        clearChanged();
-    }
 
 	@Override
 	public void run() {

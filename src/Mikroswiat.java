@@ -12,7 +12,7 @@ import java.util.Observable;
 import javax.swing.JPanel;
 
 
-public class Mikroswiat extends Observable{
+public class Mikroswiat extends NotyfikatorGlownegoOkna{
 
     private int columnCount;
     private int rowCount;
@@ -142,25 +142,19 @@ public class Mikroswiat extends Observable{
     			}
     		}
     		g2d.dispose();
-    		zmianaStanu(ZrodloZmianyEnum.UZYTKOWNIK, stworzone, usmiercone,liczbaZyjacychKomorek,liczbaMartwychKomorek);
+    		zmianaStanu(ZrodloZmianyEnum.UZYTKOWNIK, stworzone, usmiercone,liczbaZyjacychKomorek,liczbaMartwychKomorek,0,0);
     	}
-    }
-
-    private void zmianaStanu(ZrodloZmianyEnum zrodlo,int liczbaNarodzonych,int liczbaUsmierconych, int liczbaZyjacychKomorek, int liczbaMartwychKomorek) {
-        setChanged();
-        notifyObservers(new StanMikroswiata(zrodlo,liczbaNarodzonych,liczbaUsmierconych,liczbaZyjacychKomorek,liczbaMartwychKomorek));
-        clearChanged();
     }
    
     public MikroswiatJPanel getMikroswiatJPanel() {
 		return mikroswiatJPanel;
 	}
     
-    public List<Komorka> getStanMikroswiata() {
+    public List<Komorka> getListeKomorek() {
 		return komorki;
 	}
 
-	public void setStanMikroswiata(List<Komorka> stanMikroswiata) {
+	public void setListeKomorek(List<Komorka> stanMikroswiata) {
 		this.komorki = stanMikroswiata;
 	}
 }
