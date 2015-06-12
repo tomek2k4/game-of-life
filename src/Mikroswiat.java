@@ -71,7 +71,6 @@ public class Mikroswiat extends NotyfikatorGlownegoOkna{
     	
     	@Override
     	public void invalidate() {
-    		komorki.clear();
     		wybranaKomorka = null;
     		super.invalidate();
     	}

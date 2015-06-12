@@ -6,6 +6,7 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -122,7 +123,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     
     public void addPanelSterowania(){
 
-    	panelSterowania.setLayout(new GridLayout(7,1,0,0));
+    	panelSterowania.setLayout(new GridLayout(7,1,0,ODSTEP_PANELI));
     	Container regulaCont = new JPanel(new GridLayout(2, 1));
     	regulaLabel.setFont(FONT_SETUP);
     	regulaLabel.setBorder(BorderFactory.createEmptyBorder(0,ODSTEP_PANELI,0,0));
@@ -148,6 +149,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     	
        	GridBagConstraints c = new GridBagConstraints();
     	c.fill = GridBagConstraints.HORIZONTAL;
+    	c.insets = new Insets(0, ODSTEP_PANELI, 0, 0);
     	c.weightx = 0.5;
     	c.gridx = 1;
     	c.gridy = 0;
@@ -196,7 +198,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     }
 
     public static void main(String[] args) {
-    	GlowneOkno okno = new GlowneOkno(WielkoscPlanszyEnum.SREDNIA);
+    	GlowneOkno okno = new GlowneOkno(WielkoscPlanszyEnum.DUZA);
     }
 
 	@Override
