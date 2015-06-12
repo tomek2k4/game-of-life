@@ -11,8 +11,18 @@ public class Zycie extends NotyfikatorGlownegoOkna implements Runnable{
 	private Integer wymiarMikroswiata;
 	private Integer numerKroku = 0;
 	
-	public Zycie() {
+	private boolean run = false;
+	private boolean symuluj = false;
+	private long sleepIntervalMs;
+	
+	private List<Komorka> komorki;
+	
+
+
+	public Zycie(List<Komorka> komorki) {
 		super();
+		
+		this.komorki = komorki;
 		
 		this.regulyPrzezycia = new TreeSet<Integer>();
 		this.regulyPrzezycia.add(3);
@@ -20,15 +30,48 @@ public class Zycie extends NotyfikatorGlownegoOkna implements Runnable{
 		
 		this.regulyNarodzin = new TreeSet<Integer>();
 		this.regulyNarodzin.add(3);
+		
+		sleepIntervalMs = 1000;
 	}
 	
 	
-	public void decCykl(List<Komorka> komorki) {
+	@Override
+	public void run() {
+		int ln=0,lu=0;
+		StanMikroswiata sm = null;
+		run = true;
+		while(run){
+			if(isSymuluj()){
+				sm = cykl();
+				ln = ln + sm.getLiczbaNarodzonychKomorek();
+				lu = lu + sm.getLiczbaUsmierconychKomorek();	
+				zmianaStanu(ZrodloZmianyEnum.SYMULACJA,0,0,0,0,0,0);
+				zmianaStanu(sm.getZrodlo(), 
+						ln, 
+						lu, 
+						sm.getLiczbaZyjacych(), sm.getLiczbaMartwych(), 
+						1, sm.getNumerCyklu());		
+			}
+			if(sm!=null){
+				ln = 0;
+				lu = 0;
+				sm = null;
+			}
+			
+			try {
+				Thread.sleep(sleepIntervalMs);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void decCykl() {
 		int ln=0,lu=0;
 
 		StanMikroswiata sm = null;
 		for(int i=0;i<DZIESIEC_CYKLI;i++){
-			sm = cykl(komorki);
+			sm = cykl();
 			ln = ln + sm.getLiczbaNarodzonychKomorek();
 			lu = lu + sm.getLiczbaUsmierconychKomorek();
 		}
@@ -39,12 +82,12 @@ public class Zycie extends NotyfikatorGlownegoOkna implements Runnable{
 				10, sm.getNumerCyklu());
 	}
 	
-	public void jedenCykl(List<Komorka> komorki){
-		StanMikroswiata sm = cykl(komorki);
+	public void jedenCykl(){
+		StanMikroswiata sm = cykl();
 		zmianaStanu(sm);
 	}
 	
-	private StanMikroswiata cykl(List<Komorka> komorki) {
+	private StanMikroswiata cykl() {
 		int liczbaNarodzonych = 0;
 		int liczbaUsmierconych = 0;
 		int liczbaZyjacychKomorek = 0;
@@ -136,14 +179,22 @@ public class Zycie extends NotyfikatorGlownegoOkna implements Runnable{
 		}
 	}
 
+	public boolean isSymuluj() {
+		return symuluj;
+	}
 
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		
+	public void setSymuluj(boolean symuluj) {
+		this.symuluj = symuluj;
+	}
+
+	public long getSleepIntervalMs() {
+		return sleepIntervalMs;
 	}
 
 
+	public void setSleepIntervalMs(long sleepIntervalMs) {
+		this.sleepIntervalMs = sleepIntervalMs;
+	}
 
 
 }

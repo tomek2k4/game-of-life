@@ -24,10 +24,13 @@ public class Mikroswiat extends NotyfikatorGlownegoOkna{
 	private Dimension wymiarPlanszy;
 	
 	private MikroswiatJPanel mikroswiatJPanel;
+	
+	private boolean symulacja = false;
 
-    public Mikroswiat(WielkoscPlanszyEnum plansza) {
+	public Mikroswiat(WielkoscPlanszyEnum plansza) {
  
     	mikroswiatJPanel = new MikroswiatJPanel();
+
     	
     	wymiarPlanszy = plansza.getWymiar();
     	rowCount = plansza.getWymiar().width / Komorka.CELL_SIZE;
@@ -40,20 +43,21 @@ public class Mikroswiat extends NotyfikatorGlownegoOkna{
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-              Point point = e.getPoint();
-
-              int width = mikroswiatJPanel.getWidth();
-              int height = mikroswiatJPanel.getHeight();
-
-              int cellWidth = width / columnCount;
-              int cellHeight = height / rowCount;
-
-              int column = e.getX() / cellWidth;
-              int row = e.getY() / cellHeight;
-
-              wybranaKomorka = new Point(column, row);
-              mikroswiatJPanel.repaint();
-                            
+              if(!isSymulacja()){
+            	  Point point = e.getPoint();
+            	  
+            	  int width = mikroswiatJPanel.getWidth();
+            	  int height = mikroswiatJPanel.getHeight();
+            	  
+            	  int cellWidth = width / columnCount;
+            	  int cellHeight = height / rowCount;
+            	  
+            	  int column = e.getX() / cellWidth;
+            	  int row = e.getY() / cellHeight;
+            	  
+            	  wybranaKomorka = new Point(column, row);
+            	  mikroswiatJPanel.repaint();            	  
+              }        
 			}
         	  
         };
@@ -155,6 +159,14 @@ public class Mikroswiat extends NotyfikatorGlownegoOkna{
 
 	public void setListeKomorek(List<Komorka> stanMikroswiata) {
 		this.komorki = stanMikroswiata;
+	}
+	
+    public boolean isSymulacja() {
+		return symulacja;
+	}
+
+	public void setSymulacja(boolean symulacja) {
+		this.symulacja = symulacja;
 	}
 }
 	

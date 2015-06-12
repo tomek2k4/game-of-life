@@ -22,7 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 import javax.swing.border.Border;
 
 
@@ -31,9 +30,9 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	
 	private static final Font FONT_SETUP = new Font("Verdana", Font.PLAIN, 11);
 
-	private enum Actions {
+	private enum Akcje {
 	    START,
-	    PAUZA,
+	    STOP,
 	    ZALADUJ, 
 	    DEC_DO_PRZODU,
 	    DO_PRZODU,
@@ -47,6 +46,9 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	
 	private static final int MIN_WYSOLOSC_PANELU_STATUSU = 80;
 	
+	private static final String ROZPOCZNIJ_STR = "Rozpocznij";
+	private static final String WSTRZYMAJ_STR = "Wstrzymaj";
+	
 	private Dimension wymiaryGlownegoOkna;
 	private Dimension wymiaryPrzycisku;
 	
@@ -58,15 +60,16 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	private StanGry stanGry;
 	private Zycie zycie;
 	
+	private Thread symulacjaThread;
+	
 	private JLabel regulaLabel = new JLabel("Regula:");
 	private JFormattedTextField regulaTextField = new JFormattedTextField();
-    private JButton startButton = new JButton("Start");
-    private JButton pauzaButton = new JButton("Pauza");
+    private JButton startStopButton = new JButton(ROZPOCZNIJ_STR);
     private JButton krokButton = new JButton("Do przodu");
     private JButton decKrokButton = new JButton("x10");
     private JButton zapiszButton = new JButton("Zapisz");
     private JButton zaladujButton = new JButton("Zaladuj");
-	private boolean wczytanoPlik;
+
     
     public GlowneOkno(WielkoscPlanszyEnum plansza){
     	super("Gra w Zycie");
@@ -89,8 +92,10 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     	this.stanGry = new StanGry();
     	this.stanGry.addObserver(this);
 
-    	this.zycie = new Zycie();
-    	this.zycie.addObserver(this);
+    	this.zycie = new Zycie(mikroswiat.getListeKomorek());
+    	this.zycie.addObserver(this);    	
+    	symulacjaThread = new Thread(this.zycie);
+    	symulacjaThread.start();
     	
     	//Create and set up the window.
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -132,19 +137,20 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     	regulaTextField.setFont(FONT_SETUP);
     	regulaTextField.setPreferredSize(wymiaryPrzycisku);
     	panelSterowania.add(regulaCont);
-    	panelSterowania.add(startButton);
-    	panelSterowania.add(pauzaButton);
+    	panelSterowania.add(startStopButton);
+    	startStopButton.setActionCommand(Akcje.START.name());
+    	startStopButton.addActionListener(this);
     	panelSterowania.add(krokButton);
-    	krokButton.setActionCommand(Actions.DO_PRZODU.name());
+    	krokButton.setActionCommand(Akcje.DO_PRZODU.name());
     	krokButton.addActionListener(this);
     	panelSterowania.add(decKrokButton);
-    	decKrokButton.setActionCommand(Actions.DEC_DO_PRZODU.name());
+    	decKrokButton.setActionCommand(Akcje.DEC_DO_PRZODU.name());
     	decKrokButton.addActionListener(this);
     	panelSterowania.add(zapiszButton);
-    	zapiszButton.setActionCommand(Actions.ZAPISZ.name());
+    	zapiszButton.setActionCommand(Akcje.ZAPISZ.name());
     	zapiszButton.addActionListener(this);
     	panelSterowania.add(zaladujButton);
-    	zaladujButton.setActionCommand(Actions.ZALADUJ.name());
+    	zaladujButton.setActionCommand(Akcje.ZALADUJ.name());
     	zaladujButton.addActionListener(this);
     	
        	GridBagConstraints c = new GridBagConstraints();
@@ -198,7 +204,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     }
 
     public static void main(String[] args) {
-    	GlowneOkno okno = new GlowneOkno(WielkoscPlanszyEnum.DUZA);
+    	GlowneOkno okno = new GlowneOkno(WielkoscPlanszyEnum.SREDNIA);
     }
 
 	@Override
@@ -206,6 +212,10 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 		StanMikroswiata sm = (StanMikroswiata)arg;
 		StringBuilder str = new StringBuilder();
 		String numerCykluInfo = "";
+		
+		if(sm.getZrodlo() == ZrodloZmianyEnum.SYMULACJA){
+			mikroswiat.getMikroswiatJPanel().repaint();
+		}
 		
 		
 		if(sm.getZrodlo() == ZrodloZmianyEnum.UZYTKOWNIK){
@@ -246,8 +256,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 		}
 		
 		if(sm.getLiczbaNarodzonychKomorek() != 0 ||
-				sm.getLiczbaUsmierconychKomorek() != 0 ||
-				wczytanoPlik){
+				sm.getLiczbaUsmierconychKomorek() != 0){
 			//Zmiana jaka nastapila
 			dodajKomunikatDoKonsoli(str.toString());
 			
@@ -262,7 +271,29 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent evt) {
-		if (evt.getActionCommand() == Actions.ZAPISZ.name()) {
+		if(evt.getActionCommand() == Akcje.START.name()){
+			startStopButton.setText(WSTRZYMAJ_STR);
+			startStopButton.setActionCommand(Akcje.STOP.name());
+			mikroswiat.setSymulacja(true);
+			dodajKomunikatDoKonsoli("Symulacja rozpoczeta by znow wprowadzac zmiany kliknij Wstrzymaj");
+			krokButton.setEnabled(false);
+			decKrokButton.setEnabled(false);
+			zapiszButton.setEnabled(false);
+			zaladujButton.setEnabled(false);
+			
+			zycie.setSymuluj(true);
+		}else if(evt.getActionCommand() == Akcje.STOP.name()){
+			startStopButton.setText(ROZPOCZNIJ_STR);
+			startStopButton.setActionCommand(Akcje.START.name());
+			mikroswiat.setSymulacja(false);
+			dodajKomunikatDoKonsoli("Symulacja zatrzymana");
+			krokButton.setEnabled(true);
+			decKrokButton.setEnabled(true);
+			zapiszButton.setEnabled(true);
+			zaladujButton.setEnabled(true);
+			
+			zycie.setSymuluj(false);
+		}else if (evt.getActionCommand() == Akcje.ZAPISZ.name()) {
 			try {
 				stanGry.zapisz(mikroswiat.getListeKomorek());
 				dodajKomunikatDoKonsoli("Zapisano stan gry pod nazwa pliku: "+StanGry.getNazwaPliku());
@@ -270,7 +301,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 				dodajKomunikatDoKonsoli("Zapisanie stanu gry nie powiodlo sie!");
 				e.printStackTrace();
 			}
-		}else if(evt.getActionCommand() == Actions.ZALADUJ.name()){
+		}else if(evt.getActionCommand() == Akcje.ZALADUJ.name()){
 			try {
 				stanGry.zaladuj(mikroswiat.getListeKomorek());
 				//dodajKomunikatDoKonsoli("Poprawnie zaladowano stan gry z pliku");
@@ -281,11 +312,11 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 				dodajKomunikatDoKonsoli("Nie odnalazl pliku ze stanem gry");
 				e.printStackTrace();
 			}
-		}else if(evt.getActionCommand() == Actions.DO_PRZODU.name()){
-			zycie.jedenCykl(mikroswiat.getListeKomorek());
+		}else if(evt.getActionCommand() == Akcje.DO_PRZODU.name()){
+			zycie.jedenCykl();
 			mikroswiat.getMikroswiatJPanel().repaint();
-		}else if(evt.getActionCommand() == Actions.DEC_DO_PRZODU.name()){
-			zycie.decCykl(mikroswiat.getListeKomorek());
+		}else if(evt.getActionCommand() == Akcje.DEC_DO_PRZODU.name()){
+			zycie.decCykl();
 			mikroswiat.getMikroswiatJPanel().repaint();
 		}
 	}
