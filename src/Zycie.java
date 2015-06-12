@@ -191,14 +191,22 @@ public class Zycie extends NotyfikatorGlownegoOkna implements Runnable{
 		IndeksyKomorek indeksySasiadow = new IndeksyKomorek();
 		int liczbaZywychSasiadow = 0;
 		
-		indeksySasiadow.add(idx-wymiarMikroswiata-1);//upper-left
+		//check if not left border cell
+		if(idx%wymiarMikroswiata!=0){
+			indeksySasiadow.add(idx-wymiarMikroswiata-1);//upper-left
+			indeksySasiadow.add(idx+wymiarMikroswiata-1);//lower-left
+			indeksySasiadow.add(idx-1);//left		
+		}
+		
 		indeksySasiadow.add(idx-wymiarMikroswiata);//upper
-		indeksySasiadow.add(idx-wymiarMikroswiata+1);//upper-right
-		indeksySasiadow.add(idx-1);//left
-		indeksySasiadow.add(idx+1);//right
-		indeksySasiadow.add(idx+wymiarMikroswiata-1);//lower-left
 		indeksySasiadow.add(idx+wymiarMikroswiata);//lower
-		indeksySasiadow.add(idx+wymiarMikroswiata+1);//lower-right
+		
+		//check if not right border cell
+		if(idx%wymiarMikroswiata!=wymiarMikroswiata-1){
+			indeksySasiadow.add(idx-wymiarMikroswiata+1);//upper-right
+			indeksySasiadow.add(idx+1);//right
+			indeksySasiadow.add(idx+wymiarMikroswiata+1);//lower-right		
+		}
 		
 		for(Integer index:indeksySasiadow){
 			if(komorki.get(index).getStan().equals(StanKomorkiEnum.ZYWA)){
