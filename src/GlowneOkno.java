@@ -39,12 +39,12 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	    WYCZYSC
 	  }
 	
-	private static final int ILOSC_LINI_PANELU_STATUSU = 3;
+	private static final int ILOSC_LINI_PANELU_STATUSU = 5;
 	private static final int MAKS_LINI_W_KONSOLI = 1000;
 	private static final int ODSTEP_GLOWNEGO_OKNA = 5;
 	private static final int ODSTEP_PANELI = 5;
 	
-	private static final int MIN_WYSOLOSC_PANELU_STATUSU = 80;
+	private static final int MIN_WYSOLOSC_PANELU_STATUSU = 140;
 	
 	private static final String ROZPOCZNIJ_STR = "Rozpocznij";
 	private static final String WSTRZYMAJ_STR = "Wstrzymaj";
@@ -212,7 +212,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     }
 
     public static void main(String[] args) {
-    	GlowneOkno okno = new GlowneOkno(WielkoscPlanszyEnum.SREDNIA);
+    	GlowneOkno okno = new GlowneOkno(WielkoscPlanszyEnum.MALA);
     }
 
 	@Override
@@ -288,6 +288,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 			decKrokButton.setEnabled(false);
 			zapiszButton.setEnabled(false);
 			zaladujButton.setEnabled(false);
+			wyczyscButton.setEnabled(false);
 			
 			if(zycie.ustawRegule(regulaTextField.getText())){
 				dodajKomunikatDoKonsoli("Ustawiono regule: "+regulaTextField.getText());
@@ -304,6 +305,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 			decKrokButton.setEnabled(true);
 			zapiszButton.setEnabled(true);
 			zaladujButton.setEnabled(true);
+			wyczyscButton.setEnabled(true);
 			
 			zycie.setSymuluj(false);
 		}else if (evt.getActionCommand() == Akcje.ZAPISZ.name()) {
