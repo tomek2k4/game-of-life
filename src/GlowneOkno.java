@@ -25,7 +25,6 @@ import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
 
-
 public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	
 	private static final Font FONT_SETUP = new Font("Verdana", Font.PLAIN, 11);
@@ -36,7 +35,8 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	    ZALADUJ, 
 	    DEC_DO_PRZODU,
 	    DO_PRZODU,
-	    ZAPISZ
+	    ZAPISZ,
+	    WYCZYSC
 	  }
 	
 	private static final int ILOSC_LINI_PANELU_STATUSU = 3;
@@ -48,6 +48,8 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	
 	private static final String ROZPOCZNIJ_STR = "Rozpocznij";
 	private static final String WSTRZYMAJ_STR = "Wstrzymaj";
+	
+	private static final String REGULA_CONWAYA = "23/3";
 	
 	private Dimension wymiaryGlownegoOkna;
 	private Dimension wymiaryPrzycisku;
@@ -69,6 +71,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     private JButton decKrokButton = new JButton("x10");
     private JButton zapiszButton = new JButton("Zapisz");
     private JButton zaladujButton = new JButton("Zaladuj");
+    private JButton wyczyscButton = new JButton("Wyczysc");
 
     
     public GlowneOkno(WielkoscPlanszyEnum plansza){
@@ -136,6 +139,8 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     	regulaCont.add(regulaTextField);
     	regulaTextField.setFont(FONT_SETUP);
     	regulaTextField.setPreferredSize(wymiaryPrzycisku);
+    	regulaTextField.setText(REGULA_CONWAYA);
+    	
     	panelSterowania.add(regulaCont);
     	panelSterowania.add(startStopButton);
     	startStopButton.setActionCommand(Akcje.START.name());
@@ -152,6 +157,9 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     	panelSterowania.add(zaladujButton);
     	zaladujButton.setActionCommand(Akcje.ZALADUJ.name());
     	zaladujButton.addActionListener(this);
+    	panelSterowania.add(wyczyscButton);
+    	wyczyscButton.setActionCommand(Akcje.WYCZYSC.name());
+    	wyczyscButton.addActionListener(this);
     	
        	GridBagConstraints c = new GridBagConstraints();
     	c.fill = GridBagConstraints.HORIZONTAL;
@@ -260,7 +268,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 			//Zmiana jaka nastapila
 			dodajKomunikatDoKonsoli(str.toString());
 			
-			if(sm.getZrodlo().equals(ZrodloZmianyEnum.ZYCIE)) numerCykluInfo= new String(" L = "+sm.getNumerCyklu());
+			if(sm.getZrodlo().equals(ZrodloZmianyEnum.ZYCIE)) numerCykluInfo= new String(" K = "+sm.getNumerCyklu());
 			
 			//podsumowanie stanu obecnego
 			dodajKomunikatDoKonsoli("Obecnie jest "+sm.getLiczbaZyjacych()+" zyjacych komorek oraz "+
@@ -281,6 +289,11 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 			zapiszButton.setEnabled(false);
 			zaladujButton.setEnabled(false);
 			
+			if(zycie.ustawRegule(regulaTextField.getText())){
+				dodajKomunikatDoKonsoli("Ustawiono regule: "+regulaTextField.getText());
+			}else{
+				dodajKomunikatDoKonsoli("Regula nie spelnia zalozen, wpisz np.:"+REGULA_CONWAYA);
+			}
 			zycie.setSymuluj(true);
 		}else if(evt.getActionCommand() == Akcje.STOP.name()){
 			startStopButton.setText(ROZPOCZNIJ_STR);
@@ -313,10 +326,20 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 				e.printStackTrace();
 			}
 		}else if(evt.getActionCommand() == Akcje.DO_PRZODU.name()){
+			if(!zycie.ustawRegule(regulaTextField.getText())){
+				dodajKomunikatDoKonsoli("Regula nie spelnia zalozen, wpisz np.:"+REGULA_CONWAYA);
+			}
 			zycie.jedenCykl();
 			mikroswiat.getMikroswiatJPanel().repaint();
 		}else if(evt.getActionCommand() == Akcje.DEC_DO_PRZODU.name()){
+			if(!zycie.ustawRegule(regulaTextField.getText())){
+				dodajKomunikatDoKonsoli("Regula nie spelnia zalozen, wpisz np.:"+REGULA_CONWAYA);
+			}
 			zycie.decCykl();
+			mikroswiat.getMikroswiatJPanel().repaint();
+		}else if(evt.getActionCommand() == Akcje.WYCZYSC.name()){
+			mikroswiat.getListeKomorek().clear();
+			zycie.setNumerKroku(0);
 			mikroswiat.getMikroswiatJPanel().repaint();
 		}
 	}

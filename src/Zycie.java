@@ -1,3 +1,6 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
@@ -6,11 +9,12 @@ import java.util.TreeSet;
 public class Zycie extends NotyfikatorGlownegoOkna implements Runnable{
 
 	private static final int DZIESIEC_CYKLI = 10;
+	private static final String REGULA_PATTERN = "(\\d*)\\/(\\d*)";
+	
 	private TreeSet<Integer> regulyPrzezycia;
 	private TreeSet<Integer> regulyNarodzin;	
 	private Integer wymiarMikroswiata;
 	private Integer numerKroku = 0;
-	
 	private boolean run = false;
 	private boolean symuluj = false;
 	private long sleepIntervalMs;
@@ -86,6 +90,45 @@ public class Zycie extends NotyfikatorGlownegoOkna implements Runnable{
 		StanMikroswiata sm = cykl();
 		zmianaStanu(sm);
 	}
+	
+	public boolean ustawRegule(String regulaStr){
+        boolean result = true;
+        String regulyPrzezyciaStr;
+        String regulyNarodzinStr;
+		
+		if(regulaStr.matches(REGULA_PATTERN)){
+			regulyPrzezycia.clear();
+			regulyNarodzin.clear();
+			
+			int przezycie = 0;
+			int narodziny = 0;
+			regulyPrzezyciaStr = regulaStr.replaceAll(REGULA_PATTERN, "$1");
+			regulyNarodzinStr = regulaStr.replaceAll(REGULA_PATTERN, "$2");
+			
+			BufferedReader przezycieBuffReader = new BufferedReader(new StringReader(regulyPrzezyciaStr));
+			BufferedReader narodzinyBuffReader = new BufferedReader(new StringReader(regulyNarodzinStr));
+			
+	        try {
+				while ((przezycie = przezycieBuffReader.read()) != -1) {
+					regulyPrzezycia.add(Integer.parseInt(Character.toString ((char) przezycie)));
+				}
+				while ((narodziny = narodzinyBuffReader.read()) != -1) {
+					regulyNarodzin.add(Integer.parseInt(Character.toString ((char) narodziny)));
+				}
+			} catch (IOException e) {
+				result = false;
+			}
+		}else{
+			result = false;
+		}
+		
+
+		return result;
+	}
+	
+	
+	
+	
 	
 	private StanMikroswiata cykl() {
 		int liczbaNarodzonych = 0;
@@ -195,6 +238,12 @@ public class Zycie extends NotyfikatorGlownegoOkna implements Runnable{
 	public void setSleepIntervalMs(long sleepIntervalMs) {
 		this.sleepIntervalMs = sleepIntervalMs;
 	}
+	
+	public Integer getNumerKroku() {
+		return numerKroku;
+	}
 
-
+	public void setNumerKroku(Integer numerKroku) {
+		this.numerKroku = numerKroku;
+	}
 }

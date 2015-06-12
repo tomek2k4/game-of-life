@@ -59,8 +59,6 @@ public class StanGry extends NotyfikatorGlownegoOkna{
                 				komorka.setStan(StanKomorkiEnum.MARTWA);
                 			}
                 		}              		
-//                		komorki.get(i).setStan(
-//                				stanStr.equals(ZNACZNIK_ZYWA_KOMORKA)?StanKomorkiEnum.ZYWA:StanKomorkiEnum.MARTWA);
                 	}catch(IndexOutOfBoundsException e){
                 		throw e;
                 	}
