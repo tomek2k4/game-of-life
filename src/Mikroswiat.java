@@ -31,6 +31,9 @@ public class Mikroswiat extends NotyfikatorGlownegoOkna{
  
     	mikroswiatJPanel = new MikroswiatJPanel();
 
+    	if(plansza.equals(WielkoscPlanszyEnum.OGROMNA)){
+    		Komorka.setCellSize(10);
+    	}
     	
     	wymiarPlanszy = plansza.getWymiar();
     	rowCount = plansza.getWymiar().width / Komorka.CELL_SIZE;

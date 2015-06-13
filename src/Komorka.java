@@ -6,7 +6,7 @@ import javax.swing.JButton;
 public class Komorka extends Rectangle{
 
 
-	public static final int CELL_SIZE = 20;
+	public static int CELL_SIZE = 20;
     private StanKomorkiEnum stan = StanKomorkiEnum.MARTWA;
 	
 	public StanKomorkiEnum getStan() {
@@ -19,5 +19,9 @@ public class Komorka extends Rectangle{
 
 	public Komorka(int i, int j, int cellWidth, int cellHeight) {
 		super(i,j,cellWidth,cellHeight);
+	}
+
+	public static void setCellSize(int i) {
+		CELL_SIZE = 10;
 	}	
 }

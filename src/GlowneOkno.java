@@ -1,4 +1,5 @@
 
+
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -29,7 +30,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	
 	private static final Font FONT_SETUP = new Font("Verdana", Font.PLAIN, 11);
 
-	private enum Akcje {
+	private enum AkcjePlanszy {
 	    START,
 	    STOP,
 	    ZALADUJ, 
@@ -72,13 +73,14 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     private JButton zapiszButton = new JButton("Zapisz");
     private JButton zaladujButton = new JButton("Zaladuj");
     private JButton wyczyscButton = new JButton("Wyczysc");
+	private static JFrame mainMenu;
 
     
     public GlowneOkno(WielkoscPlanszyEnum plansza){
     	super("Gra w Zycie");
     	
     	wymiaryPrzycisku =  new JButton("default button").getPreferredSize();
-    	
+
     	wymiaryGlownegoOkna = new Dimension(plansza.getWymiar().width + wymiaryPrzycisku.width + 2*ODSTEP_GLOWNEGO_OKNA +ODSTEP_PANELI, 
     			plansza.getWymiar().height +  MIN_WYSOLOSC_PANELU_STATUSU + 2*ODSTEP_GLOWNEGO_OKNA + ODSTEP_PANELI);
     			
@@ -143,22 +145,22 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     	
     	panelSterowania.add(regulaCont);
     	panelSterowania.add(startStopButton);
-    	startStopButton.setActionCommand(Akcje.START.name());
+    	startStopButton.setActionCommand(AkcjePlanszy.START.name());
     	startStopButton.addActionListener(this);
     	panelSterowania.add(krokButton);
-    	krokButton.setActionCommand(Akcje.DO_PRZODU.name());
+    	krokButton.setActionCommand(AkcjePlanszy.DO_PRZODU.name());
     	krokButton.addActionListener(this);
     	panelSterowania.add(decKrokButton);
-    	decKrokButton.setActionCommand(Akcje.DEC_DO_PRZODU.name());
+    	decKrokButton.setActionCommand(AkcjePlanszy.DEC_DO_PRZODU.name());
     	decKrokButton.addActionListener(this);
     	panelSterowania.add(zapiszButton);
-    	zapiszButton.setActionCommand(Akcje.ZAPISZ.name());
+    	zapiszButton.setActionCommand(AkcjePlanszy.ZAPISZ.name());
     	zapiszButton.addActionListener(this);
     	panelSterowania.add(zaladujButton);
-    	zaladujButton.setActionCommand(Akcje.ZALADUJ.name());
+    	zaladujButton.setActionCommand(AkcjePlanszy.ZALADUJ.name());
     	zaladujButton.addActionListener(this);
     	panelSterowania.add(wyczyscButton);
-    	wyczyscButton.setActionCommand(Akcje.WYCZYSC.name());
+    	wyczyscButton.setActionCommand(AkcjePlanszy.WYCZYSC.name());
     	wyczyscButton.addActionListener(this);
     	
        	GridBagConstraints c = new GridBagConstraints();
@@ -210,9 +212,15 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
         //was a selection in the text area.
         konsola.setCaretPosition(0);
     }
-
+    
     public static void main(String[] args) {
-    	GlowneOkno okno = new GlowneOkno(WielkoscPlanszyEnum.MALA);
+    	
+    	GlowneMenu glowneMenu = new GlowneMenu();
+    	LadowaniePlanszyActionListener ladowaniePlanszyActionListener = 
+    			new LadowaniePlanszyActionListener(glowneMenu);
+    	glowneMenu.setLadowaniePlanszyActionListener(ladowaniePlanszyActionListener);
+    	glowneMenu.wyswietlMenu();
+    	
     }
 
 	@Override
@@ -279,9 +287,9 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent evt) {
-		if(evt.getActionCommand() == Akcje.START.name()){
+		if(evt.getActionCommand() == AkcjePlanszy.START.name()){
 			startStopButton.setText(WSTRZYMAJ_STR);
-			startStopButton.setActionCommand(Akcje.STOP.name());
+			startStopButton.setActionCommand(AkcjePlanszy.STOP.name());
 			mikroswiat.setSymulacja(true);
 			dodajKomunikatDoKonsoli("Symulacja rozpoczeta by znow wprowadzac zmiany kliknij Wstrzymaj");
 			krokButton.setEnabled(false);
@@ -296,9 +304,9 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 				dodajKomunikatDoKonsoli("Regula nie spelnia zalozen, wpisz np.:"+REGULA_CONWAYA);
 			}
 			zycie.setSymuluj(true);
-		}else if(evt.getActionCommand() == Akcje.STOP.name()){
+		}else if(evt.getActionCommand() == AkcjePlanszy.STOP.name()){
 			startStopButton.setText(ROZPOCZNIJ_STR);
-			startStopButton.setActionCommand(Akcje.START.name());
+			startStopButton.setActionCommand(AkcjePlanszy.START.name());
 			mikroswiat.setSymulacja(false);
 			dodajKomunikatDoKonsoli("Symulacja zatrzymana");
 			krokButton.setEnabled(true);
@@ -308,7 +316,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 			wyczyscButton.setEnabled(true);
 			
 			zycie.setSymuluj(false);
-		}else if (evt.getActionCommand() == Akcje.ZAPISZ.name()) {
+		}else if (evt.getActionCommand() == AkcjePlanszy.ZAPISZ.name()) {
 			try {
 				stanGry.zapisz(mikroswiat.getListeKomorek());
 				dodajKomunikatDoKonsoli("Zapisano stan gry pod nazwa pliku: "+StanGry.getNazwaPliku());
@@ -316,7 +324,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 				dodajKomunikatDoKonsoli("Zapisanie stanu gry nie powiodlo sie!");
 				e.printStackTrace();
 			}
-		}else if(evt.getActionCommand() == Akcje.ZALADUJ.name()){
+		}else if(evt.getActionCommand() == AkcjePlanszy.ZALADUJ.name()){
 			try {
 				stanGry.zaladuj(mikroswiat.getListeKomorek());
 				//dodajKomunikatDoKonsoli("Poprawnie zaladowano stan gry z pliku");
@@ -327,19 +335,19 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 				dodajKomunikatDoKonsoli("Nie odnalazl pliku ze stanem gry");
 				e.printStackTrace();
 			}
-		}else if(evt.getActionCommand() == Akcje.DO_PRZODU.name()){
+		}else if(evt.getActionCommand() == AkcjePlanszy.DO_PRZODU.name()){
 			if(!zycie.ustawRegule(regulaTextField.getText())){
 				dodajKomunikatDoKonsoli("Regula nie spelnia zalozen, wpisz np.:"+REGULA_CONWAYA);
 			}
 			zycie.jedenCykl();
 			mikroswiat.getMikroswiatJPanel().repaint();
-		}else if(evt.getActionCommand() == Akcje.DEC_DO_PRZODU.name()){
+		}else if(evt.getActionCommand() == AkcjePlanszy.DEC_DO_PRZODU.name()){
 			if(!zycie.ustawRegule(regulaTextField.getText())){
 				dodajKomunikatDoKonsoli("Regula nie spelnia zalozen, wpisz np.:"+REGULA_CONWAYA);
 			}
 			zycie.decCykl();
 			mikroswiat.getMikroswiatJPanel().repaint();
-		}else if(evt.getActionCommand() == Akcje.WYCZYSC.name()){
+		}else if(evt.getActionCommand() == AkcjePlanszy.WYCZYSC.name()){
 			mikroswiat.getListeKomorek().clear();
 			zycie.setNumerKroku(0);
 			mikroswiat.getMikroswiatJPanel().repaint();
