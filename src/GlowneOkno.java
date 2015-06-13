@@ -22,11 +22,14 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JSlider;
 import javax.swing.JTextArea;
 import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 
-public class GlowneOkno extends JFrame implements Observer,ActionListener {
+public class GlowneOkno extends JFrame implements Observer,ActionListener, ChangeListener {
 	
 	private static final Font FONT_SETUP = new Font("Verdana", Font.PLAIN, 11);
 
@@ -51,6 +54,9 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 	private static final String WSTRZYMAJ_STR = "Wstrzymaj";
 	
 	private static final String REGULA_CONWAYA = "23/3";
+	private static final int FPS_MAX = 1000;
+	private static final int FPS_INIT = 550;
+	private static final int FPS_MIN = 100;
 	
 	private Dimension wymiaryGlownegoOkna;
 	private Dimension wymiaryPrzycisku;
@@ -73,6 +79,10 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     private JButton zapiszButton = new JButton("Zapisz");
     private JButton zaladujButton = new JButton("Zaladuj");
     private JButton wyczyscButton = new JButton("Wyczysc");
+    //Create the slider.
+    JSlider czestotliwosc = new JSlider(JSlider.HORIZONTAL,
+                                          FPS_MIN, FPS_MAX, FPS_INIT);
+    
 	private static JFrame mainMenu;
 
     
@@ -133,7 +143,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     
     public void addPanelSterowania(){
 
-    	panelSterowania.setLayout(new GridLayout(7,1,0,ODSTEP_PANELI));
+    	panelSterowania.setLayout(new GridLayout(8,1,0,ODSTEP_PANELI));
     	Container regulaCont = new JPanel(new GridLayout(2, 1));
     	regulaLabel.setFont(FONT_SETUP);
     	regulaLabel.setBorder(BorderFactory.createEmptyBorder(0,ODSTEP_PANELI,0,0));
@@ -162,6 +172,12 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
     	panelSterowania.add(wyczyscButton);
     	wyczyscButton.setActionCommand(AkcjePlanszy.WYCZYSC.name());
     	wyczyscButton.addActionListener(this);
+    	panelSterowania.add(czestotliwosc);
+    	czestotliwosc.addChangeListener(this);
+    	czestotliwosc.setMajorTickSpacing(10);
+    	czestotliwosc.setMinorTickSpacing(1);
+    	czestotliwosc.setPaintTicks(false);
+    	czestotliwosc.setPaintLabels(false);
     	
        	GridBagConstraints c = new GridBagConstraints();
     	c.fill = GridBagConstraints.HORIZONTAL;
@@ -298,6 +314,8 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 			zaladujButton.setEnabled(false);
 			wyczyscButton.setEnabled(false);
 			
+			zycie.setSleepIntervalMs(wyskalujInterwal((int)czestotliwosc.getValue()));
+			
 			if(zycie.ustawRegule(regulaTextField.getText())){
 				dodajKomunikatDoKonsoli("Ustawiono regule: "+regulaTextField.getText());
 			}else{
@@ -339,12 +357,14 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 			if(!zycie.ustawRegule(regulaTextField.getText())){
 				dodajKomunikatDoKonsoli("Regula nie spelnia zalozen, wpisz np.:"+REGULA_CONWAYA);
 			}
+			zycie.setSleepIntervalMs(wyskalujInterwal((int)czestotliwosc.getValue()));
 			zycie.jedenCykl();
 			mikroswiat.getMikroswiatJPanel().repaint();
 		}else if(evt.getActionCommand() == AkcjePlanszy.DEC_DO_PRZODU.name()){
 			if(!zycie.ustawRegule(regulaTextField.getText())){
 				dodajKomunikatDoKonsoli("Regula nie spelnia zalozen, wpisz np.:"+REGULA_CONWAYA);
 			}
+			zycie.setSleepIntervalMs(wyskalujInterwal((int)czestotliwosc.getValue()));
 			zycie.decCykl();
 			mikroswiat.getMikroswiatJPanel().repaint();
 		}else if(evt.getActionCommand() == AkcjePlanszy.WYCZYSC.name()){
@@ -352,5 +372,21 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener {
 			zycie.setNumerKroku(0);
 			mikroswiat.getMikroswiatJPanel().repaint();
 		}
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+        JSlider source = (JSlider)e.getSource();
+        if (!source.getValueIsAdjusting()) {
+            int fps = (int)source.getValue();
+            {
+            	zycie.setSleepIntervalMs(wyskalujInterwal(fps));
+            }
+        }
+		
+	}
+	
+	private long wyskalujInterwal(int fps){
+		return (long)Math.abs(fps - (FPS_MAX - FPS_MIN) -FPS_MIN);
 	}
 }
