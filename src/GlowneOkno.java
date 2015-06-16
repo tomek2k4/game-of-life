@@ -261,7 +261,7 @@ public class GlowneOkno extends JFrame implements Observer,ActionListener, Chang
 			if(sm.getLiczbaUsmierconychKomorek()>0){
 				str.append("usmiercil jedna zyjaca komorke");
 			}
-		}else if(sm.getZrodlo() == ZrodloZmianyEnum.ZYCIE){
+		}else if(sm.getZrodlo()  == ZrodloZmianyEnum.ZYCIE){
 			str.append("Przez "+sm.getZmianaCykli()+" cykli");
 			str.append(" zycie ");
 			if(sm.getLiczbaNarodzonychKomorek()>0){
